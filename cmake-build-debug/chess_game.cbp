@@ -11,10 +11,10 @@
 				<Option working_dir="D:/chess_game/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="chess_game">
@@ -24,19 +24,19 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../include"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/include"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../include"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 chess_game"/>
-					<CompileFile command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 chess_game"/>
+					<CompileFile command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="chess_game/fast">
@@ -46,39 +46,39 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../include"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed"/>
-					<Add directory="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/include"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../include"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed"/>
+					<Add directory="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 chess_game/fast"/>
-					<CompileFile command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 chess_game/fast"/>
+					<CompileFile command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
 				<Option working_dir="D:/chess_game/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
 				<Option working_dir="D:/chess_game/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="Z:/More programs/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/CLion/CLion 2022.2.1/bin/mingw/bin/mingw32-make.exe -f &quot;D:/chess_game/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>

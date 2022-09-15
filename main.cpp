@@ -711,13 +711,14 @@ int main(){
                 if((int(fir_color) == -1 * PlayerSel) or (PlayerSel > int(fir_color))) {
                     predict(from_let, from_num, PlayerSel, &chessboard1, &chessboard2, &chessboard3, array);
                     chessboard3.render();
-                    //заполнение предсказательной матрицы
+                    //перезаполнение предсказательной матрицы
                     for (int i = 0; i < 8; ++i) {
                         for (int j = 0; j < 8; ++j) {
                             chessboard3.Set("___",i,j);
                         }
                     }
-                    //размещение фигур
+
+                    //переразмещение фигур на предсказательной матрице
                     for (int i = 0; i < 32; ++i) {
                         int x, y;
                         bool color;
@@ -736,10 +737,7 @@ int main(){
                                     }else{
                                         piece_color = "b";
                                     }
-
                                     chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    chessboard2.Set(piece_color + piece_type,x,y);
-                                    chessboard1.Set(name,x,y);
                                     break;
                                 }
                                 case 2:{
@@ -751,8 +749,6 @@ int main(){
                                         piece_color = "b";
                                     }
                                     chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    chessboard2.Set(piece_color + piece_type,x,y);
-                                    chessboard1.Set(name,x,y);
                                     break;
                                 }
                                 case 3:{
@@ -764,8 +760,6 @@ int main(){
                                         piece_color = "b";
                                     }
                                     chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    chessboard2.Set(piece_color + piece_type,x,y);
-                                    chessboard1.Set(name,x,y);
                                     break;
                                 }
                                 case 4:{
@@ -777,8 +771,6 @@ int main(){
                                         piece_color = "b";
                                     }
                                     chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    chessboard2.Set(piece_color + piece_type,x,y);
-                                    chessboard1.Set(name,x,y);
                                     break;
                                 }
                                 case 5:{
@@ -790,8 +782,6 @@ int main(){
                                         piece_color = "b";
                                     }
                                     chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    chessboard2.Set(piece_color + piece_type,x,y);
-                                    chessboard1.Set(name,x,y);
                                     break;
                                 }
                                 case 6:{
@@ -803,21 +793,14 @@ int main(){
                                         piece_color = "b";
                                     }
                                     chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    chessboard2.Set(piece_color + piece_type,x,y);
-                                    chessboard1.Set(name,x,y);
                                     break;
                                 }
 
                                 default:{
-                                    chessboard3.Set(name,x,y);
-                                    chessboard2.Set(name,x,y);
-                                    chessboard1.Set(name,x,y);
                                     break;
                                 }
                             }
                         }
-
-
                     }
 
                     std::cin >> to_pos;

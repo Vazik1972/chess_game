@@ -78,6 +78,9 @@ public:
                     if ((to_num - from_num == *PlayerSel * -1) and
                         ((to_let - from_let == 1) or (to_let - from_let == -1))) {
                         if (chessboard1->Get(to_let, to_num)[1] != '_') {
+
+                            // модуль съедения
+
                             int first_piece = call(chessboard1->Get(from_let, from_num));
                             int second_piece = call(chessboard1->Get(to_let, to_num));
                             if (array[first_piece].color != array[second_piece].color) {
@@ -326,6 +329,7 @@ public:
     void get(bool *color){
         *color = this->color;
     }
+
     bool get_color(){
         return this->color;
     }
@@ -347,6 +351,17 @@ public:
         this->death = 1;
     }
 
+    void revive(int posLet, int posNum, std::string name){
+        this->posLet = posLet;
+        this->posNum = posNum;
+        this->name = name;
+        this->death = 0;
+    }
+
+    void set(std::string name){
+        this->name = name;
+    }
+
     void set(int posLet, int posNum, std::string name, bool moveCheck, bool color){
         this->posLet = posLet;
         this->posNum = posNum;
@@ -364,7 +379,7 @@ public:
 
 private:
     bool color, moveCheck, death;
-    short posLet, posNum, type;
+    short posLet, posNum;
     std::string name;
 };
 
@@ -412,6 +427,7 @@ int call(std::string name){
             piece_number = 27 + color + piece_ord;
             break;
         }
+
         case 6: {
             piece_number = 29 + color + piece_ord;
             break;
@@ -504,43 +520,43 @@ int main(){
     piece array[33];
     {
         //пешечки-пушечки
-        foo(&array[0], 0, 0, 6, "101");
-        foo(&array[0], 1, 1, 6, "102");
-        foo(&array[0], 2, 2, 6, "103");
-        foo(&array[0], 3, 3, 6, "104");
+        foo(array, 0, 0, 6, "101");
+        foo(array, 1, 1, 6, "102");
+        foo(array, 2, 2, 6, "103");
+        foo(array, 3, 3, 6, "104");
 
-        foo(&array[0], 4, 4, 6, "105");
-        foo(&array[0], 5, 5, 6, "106");
-        foo(&array[0], 6, 6, 6, "107");
-        foo(&array[0], 7, 7, 6, "108");
+        foo(array, 4, 4, 6, "105");
+        foo(array, 5, 5, 6, "106");
+        foo(array, 6, 6, 6, "107");
+        foo(array, 7, 7, 6, "108");
 
-        foo(&array[0], 8, 0, 1, "111");
-        foo(&array[0], 9, 1, 1, "112");
-        foo(&array[0], 10, 2, 1, "113");
-        foo(&array[0], 11, 3, 1, "114");
+        foo(array, 8, 0, 1, "111");
+        foo(array, 9, 1, 1, "112");
+        foo(array, 10, 2, 1, "113");
+        foo(array, 11, 3, 1, "114");
 
-        foo(&array[0], 12, 4, 1, "115");
-        foo(&array[0], 13, 5, 1, "116");
-        foo(&array[0], 14, 6, 1, "117");
-        foo(&array[0], 15, 7, 1, "118");
+        foo(array, 12, 4, 1, "115");
+        foo(array, 13, 5, 1, "116");
+        foo(array, 14, 6, 1, "117");
+        foo(array, 15, 7, 1, "118");
 
         //слоники
-        foo(&array[0], 16, 2, 7, "201");
-        foo(&array[0], 17, 5, 7, "202");
-        foo(&array[0], 18, 2, 0, "211");
-        foo(&array[0], 19, 5, 0, "212");
+        foo(array, 16, 2, 7, "201");
+        foo(array, 17, 5, 7, "202");
+        foo(array, 18, 2, 0, "211");
+        foo(array, 19, 5, 0, "212");
 
         //коники
-        foo(&array[0], 20, 1, 7, "301");
-        foo(&array[0], 21, 6, 7, "302");
-        foo(&array[0], 22, 1, 0, "311");
-        foo(&array[0], 23, 6, 0, "312");
+        foo(array, 20, 1, 7, "301");
+        foo(array, 21, 6, 7, "302");
+        foo(array, 22, 1, 0, "311");
+        foo(array, 23, 6, 0, "312");
 
         //кастлы
-        foo(&array[0], 24, 0, 7, "401");
-        foo(&array[0], 25, 7, 7, "402");
-        foo(&array[0], 26, 0, 0, "411");
-        foo(&array[0], 27, 7, 0, "412");
+        foo(array, 24, 0, 7, "401");
+        foo(array, 25, 7, 7, "402");
+        foo(array, 26, 0, 0, "411");
+        foo(array, 27, 7, 0, "412");
 
         //знать
         foo(array, 28, 3, 7, "501");
@@ -586,7 +602,7 @@ int main(){
         }
 
         //размещение фигур
-        for (int i = 0; i < 32; ++i) {
+        for (int i = 0; i < 33; ++i) {
             int x, y;
             bool color;
             std::string name;
@@ -604,9 +620,10 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
-
-                        chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                        chessboard2.Set(piece_color + piece_type,x,y);
+                        if (i!=32){
+                            chessboard3.Set(piece_color + "_" + piece_type,x,y);
+                            chessboard2.Set(piece_color + piece_type,x,y);
+                        }
                         chessboard1.Set(name,x,y);
                         break;
                     }
@@ -618,8 +635,10 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
-                        chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                        chessboard2.Set(piece_color + piece_type,x,y);
+                        if (i!=32){
+                            chessboard3.Set(piece_color + "_" + piece_type,x,y);
+                            chessboard2.Set(piece_color + piece_type,x,y);
+                        }
                         chessboard1.Set(name,x,y);
                         break;
                     }
@@ -631,8 +650,10 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
-                        chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                        chessboard2.Set(piece_color + piece_type,x,y);
+                        if (i!=32){
+                            chessboard3.Set(piece_color + "_" + piece_type,x,y);
+                            chessboard2.Set(piece_color + piece_type,x,y);
+                        }
                         chessboard1.Set(name,x,y);
                         break;
                     }
@@ -644,8 +665,10 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
-                        chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                        chessboard2.Set(piece_color + piece_type,x,y);
+                        if (i!=32){
+                            chessboard3.Set(piece_color + "_" + piece_type,x,y);
+                            chessboard2.Set(piece_color + piece_type,x,y);
+                        }
                         chessboard1.Set(name,x,y);
                         break;
                     }
@@ -657,8 +680,10 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
-                        chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                        chessboard2.Set(piece_color + piece_type,x,y);
+                        if (i!=32){
+                            chessboard3.Set(piece_color + "_" + piece_type,x,y);
+                            chessboard2.Set(piece_color + piece_type,x,y);
+                        }
                         chessboard1.Set(name,x,y);
                         break;
                     }
@@ -670,8 +695,10 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
-                        chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                        chessboard2.Set(piece_color + piece_type,x,y);
+                        if (i!=32){
+                            chessboard3.Set(piece_color + "_" + piece_type,x,y);
+                            chessboard2.Set(piece_color + piece_type,x,y);
+                        }
                         chessboard1.Set(name,x,y);
                         break;
                     }
@@ -684,8 +711,6 @@ int main(){
                     }
                 }
             }
-
-
         }
 
         if (PlayerSel == -1){
@@ -693,6 +718,7 @@ int main(){
         } else {
             std::cout << "Ход Чёрных\n";
         }
+
         //chessboard1.render();
         chessboard2.render();
         int first_piece, second_piece;
@@ -717,7 +743,7 @@ int main(){
                     }
 
                     //переразмещение фигур на предсказательной матрице
-                    for (int i = 0; i < 32; ++i) {
+                    for (int i = 0; i < 33; ++i) {
                         int x, y;
                         bool color;
                         std::string name;
@@ -725,77 +751,79 @@ int main(){
                         array[i].get(&x, &y);
                         array[i].get(&name);
                         if (array[i].get_death() == 0){
-                            int switch_piece = int(name[0]) - 48;
-                            switch (switch_piece) {
-                                case 1:{
-                                    std::string piece_type = "P";
-                                    std::string piece_color;
-                                    if (color){
-                                        piece_color = "w";
-                                    }else{
-                                        piece_color = "b";
+                            if(i != 32) {
+                                int switch_piece = int(name[0]) - 48;
+                                switch (switch_piece) {
+                                    case 1: {
+                                        std::string piece_type = "P";
+                                        std::string piece_color;
+                                        if (color) {
+                                            piece_color = "w";
+                                        } else {
+                                            piece_color = "b";
+                                        }
+                                        chessboard3.Set(piece_color + "_" + piece_type, x, y);
+                                        break;
                                     }
-                                    chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    break;
-                                }
-                                case 2:{
-                                    std::string piece_type = "B";
-                                    std::string piece_color;
-                                    if (color){
-                                        piece_color = "w";
-                                    }else{
-                                        piece_color = "b";
+                                    case 2: {
+                                        std::string piece_type = "B";
+                                        std::string piece_color;
+                                        if (color) {
+                                            piece_color = "w";
+                                        } else {
+                                            piece_color = "b";
+                                        }
+                                        chessboard3.Set(piece_color + "_" + piece_type, x, y);
+                                        break;
                                     }
-                                    chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    break;
-                                }
-                                case 3:{
-                                    std::string piece_type = "N";
-                                    std::string piece_color;
-                                    if (color){
-                                        piece_color = "w";
-                                    }else{
-                                        piece_color = "b";
+                                    case 3: {
+                                        std::string piece_type = "N";
+                                        std::string piece_color;
+                                        if (color) {
+                                            piece_color = "w";
+                                        } else {
+                                            piece_color = "b";
+                                        }
+                                        chessboard3.Set(piece_color + "_" + piece_type, x, y);
+                                        break;
                                     }
-                                    chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    break;
-                                }
-                                case 4:{
-                                    std::string piece_type = "C";
-                                    std::string piece_color;
-                                    if (color){
-                                        piece_color = "w";
-                                    }else{
-                                        piece_color = "b";
+                                    case 4: {
+                                        std::string piece_type = "C";
+                                        std::string piece_color;
+                                        if (color) {
+                                            piece_color = "w";
+                                        } else {
+                                            piece_color = "b";
+                                        }
+                                        chessboard3.Set(piece_color + "_" + piece_type, x, y);
+                                        break;
                                     }
-                                    chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    break;
-                                }
-                                case 5:{
-                                    std::string piece_type = "Q";
-                                    std::string piece_color;
-                                    if (color){
-                                        piece_color = "w";
-                                    }else{
-                                        piece_color = "b";
+                                    case 5: {
+                                        std::string piece_type = "Q";
+                                        std::string piece_color;
+                                        if (color) {
+                                            piece_color = "w";
+                                        } else {
+                                            piece_color = "b";
+                                        }
+                                        chessboard3.Set(piece_color + "_" + piece_type, x, y);
+                                        break;
                                     }
-                                    chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    break;
-                                }
-                                case 6:{
-                                    std::string piece_type = "K";
-                                    std::string piece_color;
-                                    if (color){
-                                        piece_color = "w";
-                                    }else{
-                                        piece_color = "b";
+                                    case 6: {
+                                        std::string piece_type = "K";
+                                        std::string piece_color;
+                                        if (color) {
+                                            piece_color = "w";
+                                        } else {
+                                            piece_color = "b";
+                                        }
+                                        chessboard3.Set(piece_color + "_" + piece_type, x, y);
+                                        break;
                                     }
-                                    chessboard3.Set(piece_color + "_" + piece_type,x,y);
-                                    break;
-                                }
 
-                                default:{
-                                    break;
+                                    default: {
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -839,10 +867,6 @@ int main(){
 
         }while ( l != 1);
 
-
-
     }
-
-
     return 0;
 }

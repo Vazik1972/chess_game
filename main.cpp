@@ -1,7 +1,12 @@
 #include <iostream>
 #include <string>
 #include <Windows.h>
-//ghjdthrf rjvbnjd
+
+
+
+//теперь я проверяю
+
+
 class piece;
 int call(std::string name);
 

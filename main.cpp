@@ -2,7 +2,7 @@
 #include <string>
 #include <Windows.h>
 
-
+//пук
 
 class piece;
 int call(std::string name);

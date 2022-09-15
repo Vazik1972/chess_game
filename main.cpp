@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <Windows.h>
-
+//ghjdthrf rjvbnjd
 class piece;
 int call(std::string name);
 

@@ -423,6 +423,7 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
+                        chessboard3.Set(piece_color + piece_type,x,y);
                         chessboard2.Set(piece_color + piece_type,x,y);
                         chessboard1.Set(name,x,y);
                         break;
@@ -435,6 +436,7 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
+                        chessboard3.Set(piece_color + piece_type,x,y);
                         chessboard2.Set(piece_color + piece_type,x,y);
                         chessboard1.Set(name,x,y);
                         break;
@@ -447,6 +449,7 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
+                        chessboard3.Set(piece_color + piece_type,x,y);
                         chessboard2.Set(piece_color + piece_type,x,y);
                         chessboard1.Set(name,x,y);
                         break;
@@ -459,6 +462,7 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
+                        chessboard3.Set(piece_color + piece_type,x,y);
                         chessboard2.Set(piece_color + piece_type,x,y);
                         chessboard1.Set(name,x,y);
                         break;
@@ -471,6 +475,7 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
+                        chessboard3.Set(piece_color + piece_type,x,y);
                         chessboard2.Set(piece_color + piece_type,x,y);
                         chessboard1.Set(name,x,y);
                         break;
@@ -483,12 +488,14 @@ int main(){
                         }else{
                             piece_color = "b";
                         }
+                        chessboard3.Set(piece_color + piece_type,x,y);
                         chessboard2.Set(piece_color + piece_type,x,y);
                         chessboard1.Set(name,x,y);
                         break;
                     }
 
                     default:{
+                        chessboard3.Set(name,x,y);
                         chessboard2.Set(name,x,y);
                         chessboard1.Set(name,x,y);
                         break;
@@ -509,10 +516,12 @@ int main(){
         int first_piece, second_piece;
         //чтение и перевод координат
         int l = 0;
+        std::cin >> from_pos;
         do{
-            std::cin >> from_pos;
             from_let = from_pos[0] - 65;
             from_num = from_pos[1] - 49;
+            if (from_let > 8)
+                from_let -= 32;
             if (chessboard1.Get(from_let,from_num)[1] != '_'){
                 int fir_color = array[call(chessboard1.Get(from_let,from_num))].get_color();
                 if((int(fir_color) == -1 * PlayerSel) or (PlayerSel > int(fir_color))) {
@@ -520,25 +529,21 @@ int main(){
                     std::cin >> to_pos;
                     to_let = to_pos[0] - 65;
                     to_num = to_pos[1] - 49;
+                    if (to_let > 8)
+                        to_let -= 32;
                     if (chessboard1.Get(to_let, to_num)[1] != '_'){
                         int sec_color = array[call(chessboard1.Get(to_let,to_num))].get_color();
                         if (fir_color != sec_color) {
-                            if (from_let > 8)
-                                from_let -= 32;
-                            if (to_let > 8)
-                                to_let -= 32;
                             first_piece = call(chessboard1.Get(from_let,from_num));
                             if ((-1 < from_let < 8) and (-1 < from_num < 8) and (-1 < to_let < 8) and (-1 < to_num < 8)) {
                                 array[first_piece].movement(from_let, from_num, to_let, to_num, &PlayerSel, &chessboard1, array);
                                 l=1;
                             } else
                                 std::cout << "Выход за границы доски";
-                        }else{}
+                        }else{
+                            from_pos = to_pos;
+                        }
                     }else{
-                        if (from_let > 8)
-                            from_let -= 32;
-                        if (to_let > 8)
-                            to_let -= 32;
                         first_piece = call(chessboard1.Get(from_let,from_num));
                         if ((-1 < from_let < 8) and (-1 < from_num < 8) and (-1 < to_let < 8) and (-1 < to_num < 8)) {
                             array[first_piece].movement(from_let, from_num, to_let, to_num, &PlayerSel, &chessboard1, array);
@@ -551,7 +556,8 @@ int main(){
                     std::cout << "Куда вне очереди\n";
                 }
             }else{
-                std::cout << "Выберите фигуру\n";
+                std::cout << "Выберите фигуру\n";\
+                l = 1;
             }
 
         }while ( l != 1);

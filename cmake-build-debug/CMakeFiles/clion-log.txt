@@ -1,4 +1,4 @@
-"Z:\More programs\CLion 2022.2.1\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=Z:/More programs/CLion 2022.2.1/bin/ninja/win/ninja.exe" -G Ninja -S D:\chess_game -B D:\chess_game\cmake-build-debug
+"Z:\More programs\CLion 2022.2.1\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" -S D:\chess_game -B D:\chess_game\cmake-build-debug
 -- The C compiler identification is GNU 11.2.0
 -- The CXX compiler identification is GNU 11.2.0
 -- Detecting C compiler ABI info

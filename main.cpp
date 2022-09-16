@@ -41,6 +41,10 @@ public:
 
     }
 
+    bool check_danger(int to_let, int to_num, piece array[]){
+        if ()
+    }
+
     void Set(std::string vec, int i, int j){
         matrix[i][j] = vec;
     }
@@ -322,9 +326,6 @@ public:
         return switcher;
     }
 
-    void check_eat_ability(){
-
-    }
 
     void get(bool *color){
         *color = this->color;

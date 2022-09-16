@@ -439,7 +439,7 @@ int call(std::string name){
     return piece_number;
 }
 
-void predict(int from_let, int from_num, int PlayerSel, chessboard *chessboard1, chessboard *chessboard2, chessboard *chesboard3, piece array[33]){
+void check_steps_ability(int from_let, int from_num, int PlayerSel, chessboard *chessboard1, chessboard *chessboard2, chessboard *chesboard3, piece array[33]){
     int switch_piece = int(chessboard1->Get(from_let,from_num)[0]) - 48;
     bool color = int(chessboard1->Get(from_let, from_num)[1]) - 48;
     switch (switch_piece) {
@@ -733,7 +733,7 @@ int main(){
             if (chessboard1.Get(from_let,from_num)[1] != '_'){
                 int fir_color = array[call(chessboard1.Get(from_let,from_num))].get_color();
                 if((int(fir_color) == -1 * PlayerSel) or (PlayerSel > int(fir_color))) {
-                    predict(from_let, from_num, PlayerSel, &chessboard1, &chessboard2, &chessboard3, array);
+                    check_steps_ability(from_let, from_num, PlayerSel, &chessboard1, &chessboard2, &chessboard3, array);
                     chessboard3.render();
                     //перезаполнение предсказательной матрицы
                     for (int i = 0; i < 8; ++i) {

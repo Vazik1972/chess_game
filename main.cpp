@@ -57,8 +57,6 @@ public:
         return matrix[i][j];
     }
 private:
-    //use?
-    int len = 8, wid = 8;
     std::string matrix[8][8];
 };
 
@@ -435,7 +433,7 @@ bool check_danger(int from_let, int from_num, int PlayerSel, chessboard *chessbo
 }
 
 //заполнение фигур
-void foo(piece array[], int i, short posLet, short posNum, std::string Name){
+void fill(piece array[], int i, short posLet, short posNum, std::string Name){
     bool color = int(Name[1]) - 48;
     array[i].set(posLet, posNum, Name, false, color);
 }
@@ -561,52 +559,52 @@ int main(){
     piece array[33];
     {
         //пешечки-пушечки
-        foo(array, 0, 0, 6, "101");
-        foo(array, 1, 1, 6, "102");
-        foo(array, 2, 2, 6, "103");
-        foo(array, 3, 3, 6, "104");
+        fill(array, 0, 0, 6, "101");
+        fill(array, 1, 1, 6, "102");
+        fill(array, 2, 2, 6, "103");
+        fill(array, 3, 3, 6, "104");
 
-        foo(array, 4, 4, 6, "105");
-        foo(array, 5, 5, 6, "106");
-        foo(array, 6, 6, 6, "107");
-        foo(array, 7, 7, 6, "108");
+        fill(array, 4, 4, 6, "105");
+        fill(array, 5, 5, 6, "106");
+        fill(array, 6, 6, 6, "107");
+        fill(array, 7, 7, 6, "108");
 
-        foo(array, 8, 0, 1, "111");
-        foo(array, 9, 1, 1, "112");
-        foo(array, 10, 2, 1, "113");
-        foo(array, 11, 3, 1, "114");
+        fill(array, 8, 0, 1, "111");
+        fill(array, 9, 1, 1, "112");
+        fill(array, 10, 2, 1, "113");
+        fill(array, 11, 3, 1, "114");
 
-        foo(array, 12, 4, 1, "115");
-        foo(array, 13, 5, 1, "116");
-        foo(array, 14, 6, 1, "117");
-        foo(array, 15, 7, 1, "118");
+        fill(array, 12, 4, 1, "115");
+        fill(array, 13, 5, 1, "116");
+        fill(array, 14, 6, 1, "117");
+        fill(array, 15, 7, 1, "118");
 
         //слоники
-        foo(array, 16, 2, 7, "201");
-        foo(array, 17, 5, 7, "202");
-        foo(array, 18, 2, 0, "211");
-        foo(array, 19, 5, 0, "212");
+        fill(array, 16, 2, 7, "201");
+        fill(array, 17, 5, 7, "202");
+        fill(array, 18, 2, 0, "211");
+        fill(array, 19, 5, 0, "212");
 
         //коники
-        foo(array, 20, 1, 7, "301");
-        foo(array, 21, 6, 7, "302");
-        foo(array, 22, 1, 0, "311");
-        foo(array, 23, 6, 0, "312");
+        fill(array, 20, 1, 7, "301");
+        fill(array, 21, 6, 7, "302");
+        fill(array, 22, 1, 0, "311");
+        fill(array, 23, 6, 0, "312");
 
         //кастлы
-        foo(array, 24, 0, 7, "401");
-        foo(array, 25, 7, 7, "402");
-        foo(array, 26, 0, 0, "411");
-        foo(array, 27, 7, 0, "412");
+        fill(array, 24, 0, 7, "401");
+        fill(array, 25, 7, 7, "402");
+        fill(array, 26, 0, 0, "411");
+        fill(array, 27, 7, 0, "412");
 
         //знать
-        foo(array, 28, 3, 7, "501");
-        foo(array, 29, 3, 0, "511");
-        foo(array, 30, 4, 7, "601");
-        foo(array, 31, 4, 0, "611");
+        fill(array, 28, 3, 7, "501");
+        fill(array, 29, 3, 0, "511");
+        fill(array, 30, 4, 7, "601");
+        fill(array, 31, 4, 0, "611");
 
         //гост
-        foo(array, 32, 0, 0, "___");
+        fill(array, 32, 0, 0, "___");
         array[32].kill();
     }
 

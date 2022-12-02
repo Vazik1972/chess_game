@@ -46,47 +46,7 @@ public:
     }
 
 
-    bool check_danger(int from_let, int from_num, int PlayerSel, chessboard *chessboard1, piece array[]) {
-        bool danger = false;
-        if ((from_let + 1 > -1) and (from_num + 1 < 8) and (from_num - 1 > -1)) {
-            bool fircolor;
-            int piece_type;
-            fircolor = PlayerSel == -1;
-            int to_num = from_num - PlayerSel;
-            int to_let = from_let;
-            if (((matrix[to_num][to_let - 1][1] != '_') or (matrix[to_num][to_let + 1][1] != '_')) and
-                ((int(matrix[to_num][to_let - 1][1]) - 48 != fircolor) or
-                 (int(matrix[to_num][to_let + 1][1]) - 48 != fircolor))) {
-                if ((int(matrix[to_num][to_let - 1][0]) - 48 == 1) or
-                    ((int(matrix[to_num][to_let + 1][0]) - 48 == 1))) {
-                    danger = true;
-                } else {
-                    for (int i = 15; i < 32; ++i) {
-                        std::string name;
-                        array[i].get(&name);
-                        if ((array[i].get_color() != fircolor)) {
-                            int num, let;
-                            array[i].get(&let, &num);
-                            danger = array[i].steps_predition(let, num, from_let, from_num, PlayerSel, &chessboard1,
-                                                              array);
-                        }
-                    }
-                }
 
-            } else {
-                for (int i = 15; i < 32; ++i) {
-                    std::string name;
-                    array[i].get(&name);
-                    if ((array[i].get_color() != fircolor)) {
-                        int num, let;
-                        array[i].get(&let, &num);
-                        danger = array[i].steps_predition(let, num, from_let, from_num, PlayerSel, &chessboard1,
-                                                          array);
-                    }
-                }
-            }
-        }
-    }
 
 
     void Set(std::string vec, int i, int j){
@@ -432,7 +392,47 @@ private:
  * 6 - king
 */
 
+bool check_danger(int from_let, int from_num, int PlayerSel, chessboard *chessboard1, piece array[]) {
+    bool danger = false;
+    if ((from_let + 1 > -1) and (from_num + 1 < 8) and (from_num - 1 > -1)) {
+        bool fircolor;
+        int piece_type;
+        fircolor = PlayerSel == -1;
+        int to_num = from_num - PlayerSel;
+        int to_let = from_let;
+        if (((chessboard1->Get(to_num,to_let - 1)[1] != '_') or (chessboard1->Get(to_num,to_let + 1)[1] != '_')) and
+            ((int(chessboard1->Get(to_num,to_let - 1)[1]) - 48 != fircolor) or
+             (int(chessboard1->Get(to_num,to_let + 1)[1]) - 48 != fircolor))) {
+            if ((int(chessboard1->Get(to_num,to_let - 1)[0]) - 48 == 1) or
+                ((int(chessboard1->Get(to_num,to_let + 1)[0]) - 48 == 1))) {
+                danger = true;
+            } else {
+                for (int i = 15; i < 32; ++i) {
+                    std::string name;
+                    array[i].get(&name);
+                    if ((array[i].get_color() != fircolor)) {
+                        int num, let;
+                        array[i].get(&let, &num);
+                        danger = array[i].steps_prediction(let, num, from_let, from_num, PlayerSel, chessboard1,
+                                                          array);
+                    }
+                }
+            }
 
+        } else {
+            for (int i = 15; i < 32; ++i) {
+                std::string name;
+                array[i].get(&name);
+                if ((array[i].get_color() != fircolor)) {
+                    int num, let;
+                    array[i].get(&let, &num);
+                    danger = array[i].steps_prediction(let, num, from_let, from_num, PlayerSel, chessboard1,
+                                                      array);
+                }
+            }
+        }
+    }
+}
 
 //заполнение фигур
 void foo(piece array[], int i, short posLet, short posNum, std::string Name){

@@ -14,35 +14,34 @@ class piece;
 class chessboard {
 public:
 //вывод доски с фигурами в консоль
-    void render(){
-        if (matrix[1][1].length() == 2){
-            for (short i = 7; i > -1; --i) {
-                std::cout << i+1 << "  ";
-                for (short j = 0; j < 8; ++j) {
-                    std::cout << matrix[j][i] << " ";
-                }
-                std::cout << "\n";
-            }
-            std::cout << "  ";
-            for (short i = 0; i < 8; ++i) {
-                std::cout << " " << char(i + 65) << " ";
-            }
-            std::cout << "\n";
-        }else{
-            for (short i = 7; i > -1; --i) {
-                std::cout << i+1 << "  ";
-                for (short j = 0; j < 8; ++j) {
-                    std::cout << matrix[j][i] << " ";
-                }
-                std::cout << "\n";
-            }
-            std::cout << "  ";
-            for (int i = 0; i < 8; ++i) {
-                std::cout << "  " << char(i + 65) << " ";
+    void render_view() {
+        for (short i = 7; i > -1; --i) {
+            std::cout << i + 1 << "  ";
+            for (short j = 0; j < 8; ++j) {
+                std::cout << matrix[j][i][0] << matrix[j][i][2] << " ";
             }
             std::cout << "\n";
         }
+        std::cout << "  ";
+        for (int i = 0; i < 8; ++i) {
+            std::cout << " " << char(i + 65) << " ";
+        }
+        std::cout << "\n";
+    }
 
+    void render_predict() {
+        for (short i = 7; i > -1; --i) {
+            std::cout << i + 1 << "  ";
+            for (short j = 0; j < 8; ++j) {
+                std::cout << matrix[j][i] << " ";
+            }
+            std::cout << "\n";
+        }
+        std::cout << "  ";
+        for (int i = 0; i < 8; ++i) {
+            std::cout << "  " << char(i + 65) << " ";
+        }
+        std::cout << "\n";
     }
 
 //vec - обозначение фигур на доске или их отсутствие
@@ -60,11 +59,25 @@ private:
 
 class piece
 {
-
 public:
+    void killer(short from_let, short from_num, short to_let, short to_num, int *PlayerSelector, chessboard *chessboard1, piece array[33]) {
+        int second_piece = call(chessboard1->Get(to_let, to_num));
+        array[second_piece].kill();
+    }
+
+    void mover(short from_let, short from_num, short to_let, short to_num, int *PlayerSelector, chessboard *chessboard1, piece array[33]){
+        int first_piece = call(chessboard1->Get(from_let, from_num));
+        array[first_piece].set(to_let, to_num);
+        this->moveCheck = true;
+        *PlayerSelector *= -1;
+        if(((int(name[0]) - 48) == 1) and (abs(from_num - to_num) == 2)){
+            array[32].revive(to_let, to_num - *PlayerSelector, array[call(chessboard1->Get(from_let, from_num))].name);
+        }else array[32].kill();
+    }
+
     void movement(short from_let, short from_num, short to_let, short to_num, int *PlayerSelector, chessboard *chessboard1, piece array[33]) {
         int switch_piece = int(name[0]) - 48;
-        bool color = int(chessboard1->Get(from_let, from_num)[1]) - 48, make_ghost = 0;
+        bool make_ghost = false;
         switch (switch_piece) {
             case 1: {   //пешки
                 //проверка на движение вперед
@@ -193,7 +206,6 @@ public:
     bool steps_permission(int from_let, int from_num, int to_let, int to_num, int PlayerSelector, chessboard *chessboard1, piece array[33]){
         int switch_piece = int(name[0]) - 48;
         bool switcher = false;
-        bool color = int(chessboard1->Get(from_let, from_num)[1]) - 48;
         switch (switch_piece) {
             case 1: {
                 if (((to_num - from_num) == PlayerSelector * -1) and (abs(to_let - from_let) == 1)) {
@@ -419,53 +431,44 @@ int call(std::string name){
     return piece_number;
 }
 
+
+void fill_pawn_cell(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard3, piece array[33], int to_let, int to_num, bool switcher){
+    if (array[call(chessboard1->Get(from_let,from_num))].steps_permission(from_let,from_num,to_let,to_num, PlayerSelector,chessboard1,array)){
+        std::string name = chessboard3->Get(to_let,to_num);
+        name[1] = (switcher?'$':'X');
+        chessboard3->Set(name,to_let,to_num);
+    }
+}
+
 //рендер возможных ходов
-void steps_prediction(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[33]){
+void steps_prediction(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard3, piece array[33]){
     int switch_piece = int(chessboard1->Get(from_let,from_num)[0]) - 48;
-    bool color = int(chessboard1->Get(from_let, from_num)[1]) - 48;
     switch (switch_piece) {
         case 1: {
-                //на 1 вперёд
-                int to_let = from_let;
-                int to_num = from_num + (-1 * PlayerSelector);
+            //на 1 вперёд
+            int to_let = from_let;
+            int to_num = from_num + (-1 * PlayerSelector);
 
-                if (array[call(chessboard1->Get(from_let,from_num))].steps_permission(from_let,from_num,to_let,to_num, PlayerSelector,chessboard1,array)){
-                    std::string name2 = chessboard2->Get(to_let,to_num), name3 = "___";
-                    name3[0] = name2[0];
-                    name3[1] = '$';
-                    name3[2] = name2[1];
-                    chessboard3->Set(name3,to_let,to_num);
-                }
-                //на 2 вперёд
-                to_let = from_let;
-                to_num = from_num + (-2 * PlayerSelector);
-                if (array[call(chessboard1->Get(from_let,from_num))].steps_permission(from_let,from_num,to_let,to_num, PlayerSelector,chessboard1,array)){
-                    std::string name2 = chessboard2->Get(to_let,to_num), name3 = "___";
-                    name3[0] = name2[0];
-                    name3[1] = '$';
-                    name3[2] = name2[1];
-                    chessboard3->Set(name3,to_let,to_num);
-                }
-                //диагональ вправо на 1
-                to_let = from_let + 1;
-                to_num = from_num + (-1 * PlayerSelector);
-                if (array[call(chessboard1->Get(from_let,from_num))].steps_permission(from_let,from_num,to_let,to_num, PlayerSelector,chessboard1,array)){
-                    std::string name2 = chessboard2->Get(to_let,to_num), name3 = "___";
-                    name3[0] = name2[0];
-                    name3[1] = '$';
-                    name3[2] = name2[1];
-                    chessboard3->Set(name3,to_let,to_num);
-                }
-                //диагональ влево на 1
-                to_let = from_let -1;
-                to_num = from_num + (-1 * PlayerSelector);
-                if (array[call(chessboard1->Get(from_let,from_num))].steps_permission(from_let,from_num,to_let,to_num, PlayerSelector,chessboard1,array)){
-                    std::string name2 = chessboard2->Get(to_let,to_num), name3 = "___";
-                    name3[0] = name2[0];
-                    name3[1] = '$';
-                    name3[2] = name2[1];
-                    chessboard3->Set(name3,to_let,to_num);
-                }
+            fill_pawn_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard3, array, to_let,
+                           to_num,true);
+
+            //на 2 вперёд
+            to_let = from_let;
+            to_num = from_num + (-2 * PlayerSelector);
+            fill_pawn_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard3, array, to_let,
+                           to_num, true);
+
+            //диагональ вправо на 1
+            to_let = from_let + 1;
+            to_num = from_num + (-1 * PlayerSelector);
+            fill_pawn_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                           to_num, false);
+
+            //диагональ влево на 1
+            to_let = from_let - 1;
+            to_num = from_num + (-1 * PlayerSelector);
+            fill_pawn_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard3, array, to_let,
+                           to_num, false);
 
             break;
         }
@@ -551,26 +554,18 @@ int main(){
     }
 
     chessboard chessboard1; //подложная
-    chessboard chessboard2; //выводная
     chessboard chessboard3; //предсказательная
 
     std::string from_pos, to_pos;
     int PlayerSelector = -1; //переменная вокруг которой построенно определение кто сейчас ходит
     short from_let, from_num, to_let, to_num;
 
-    while(from_let != -1){
+    while(from_pos != "-1"){
 
         //заполнение подложной матрицы
         for (short i = 0; i < 8; ++i) {
             for (short j = 0; j < 8; ++j) {
                 chessboard1.Set("___",i,j);
-            }
-        }
-
-        //заполнение выводной матрицы
-        for (short i = 0; i < 8; ++i) {
-            for (short j = 0; j < 8; ++j) {
-                chessboard2.Set("__",i,j);
             }
         }
 
@@ -591,100 +586,54 @@ int main(){
             array[i].get(&name);
             if (array[i].get_death() == 0){
                 int switch_piece = int(name[0]) - 48;
+                std::string piece_color;
+                if (color){
+                    piece_color = "w";
+                }else{
+                    piece_color = "b";
+                }
+                chessboard1.Set(name,posLet, posNum);
+                //избавляемся от chessdoard2
                 switch (switch_piece) {
                     case 1:{
-                        std::string piece_color;
-                        if (color){
-                            piece_color = "w";
-                        }else{
-                            piece_color = "b";
-                        }
                         if (i!=32){
                             chessboard3.Set(piece_color + "_P",posLet, posNum);
-                            chessboard2.Set(piece_color + "P",posLet, posNum);
                         }
-                        chessboard1.Set(name,posLet, posNum);
                         break;
                     }
                     case 2:{
-                        std::string piece_color;
-                        if (color){
-                            piece_color = "w";
-                        }else{
-                            piece_color = "b";
-                        }
                         chessboard3.Set(piece_color + "_B",posLet, posNum);
-                        chessboard2.Set(piece_color + "B",posLet, posNum);
-                        chessboard1.Set(name,posLet, posNum);
                         break;
                     }
                     case 3:{
-                        std::string piece_color;
-                        if (color){
-                            piece_color = "w";
-                        }else{
-                            piece_color = "b";
-                        }
                         chessboard3.Set(piece_color + "_N",posLet, posNum);
-                        chessboard2.Set(piece_color + "N",posLet, posNum);
-                        chessboard1.Set(name,posLet, posNum);
                         break;
                     }
                     case 4:{
-                        std::string piece_color;
-                        if (color){
-                            piece_color = "w";
-                        }else{
-                            piece_color = "b";
-                        }
                         chessboard3.Set(piece_color + "_C",posLet, posNum);
-                        chessboard2.Set(piece_color + "C",posLet, posNum);
-                        chessboard1.Set(name,posLet, posNum);
                         break;
                     }
                     case 5:{
-                        std::string piece_color;
-                        if (color){
-                            piece_color = "w";
-                        }else{
-                            piece_color = "b";
-                        }
                         chessboard3.Set(piece_color + "_Q",posLet, posNum);
-                        chessboard2.Set(piece_color + "Q",posLet, posNum);
-                        chessboard1.Set(name,posLet, posNum);
                         break;
                     }
                     case 6:{
-                        std::string piece_color;
-                        if (color){
-                            piece_color = "w";
-                        }else{
-                            piece_color = "b";
-                        }
                         chessboard3.Set(piece_color + "_K",posLet, posNum);
-                        chessboard2.Set(piece_color + "K",posLet, posNum);
-                        chessboard1.Set(name,posLet, posNum);
                         break;
                     }
 
                     default:{
                         chessboard3.Set(name,posLet, posNum);
-                        chessboard2.Set(name,posLet, posNum);
-                        chessboard1.Set(name,posLet, posNum);
                         break;
                     }
                 }
             }
         }
 
-        if (PlayerSelector == -1){
-            std::cout << "Ход Белых\n";
-        } else {
-            std::cout << "Ход Чёрных\n";
-        }
+        std::cout << (PlayerSelector == -1 ? "Ход Белых\n" : "Ход Чёрных\n");
 
-        chessboard1.render();
-        chessboard2.render();
+        //chessboard1.render_view();
+        chessboard3.render_view();
         int first_piece, second_piece;
         //чтение и перевод координат
         int l = 0;
@@ -696,8 +645,9 @@ int main(){
             if (chessboard1.Get(from_let,from_num)[1] != '_'){
                 bool FirstPieceColor = array[call(chessboard1.Get(from_let,from_num))].get_color();
                 if((int(FirstPieceColor) == -1 * PlayerSelector) or (PlayerSelector > int(FirstPieceColor))) {
-                    steps_prediction(from_let, from_num, PlayerSelector, &chessboard1, &chessboard2, &chessboard3, array);
-                    chessboard3.render();
+                    steps_prediction(from_let, from_num, PlayerSelector, &chessboard1, &chessboard3, array);
+                    //глянуть после удаления chessboard2
+                    chessboard3.render_predict();
                     //перезаполнение предсказательной матрицы
                     for (short i = 0; i < 8; ++i) {
                         for (short j = 0; j < 8; ++j) {
@@ -716,64 +666,34 @@ int main(){
                         if (array[i].get_death() == 0){
                             if(i != 32) {
                                 int switch_piece = int(name[0]) - 48;
+                                std::string piece_color;
+                                if (color) {
+                                    piece_color = "w";
+                                } else {
+                                    piece_color = "b";
+                                }
                                 switch (switch_piece) {
                                     case 1: {
-                                        std::string piece_color;
-                                        if (color) {
-                                            piece_color = "w";
-                                        } else {
-                                            piece_color = "b";
-                                        }
                                         chessboard3.Set(piece_color + "_P", posLet, posNum);
                                         break;
                                     }
                                     case 2: {
-                                        std::string piece_color;
-                                        if (color) {
-                                            piece_color = "w";
-                                        } else {
-                                            piece_color = "b";
-                                        }
                                         chessboard3.Set(piece_color + "_B", posLet, posNum);
                                         break;
                                     }
                                     case 3: {
-                                        std::string piece_color;
-                                        if (color) {
-                                            piece_color = "w";
-                                        } else {
-                                            piece_color = "b";
-                                        }
                                         chessboard3.Set(piece_color + "_N", posLet, posNum);
                                         break;
                                     }
                                     case 4: {
-                                        std::string piece_color;
-                                        if (color) {
-                                            piece_color = "w";
-                                        } else {
-                                            piece_color = "b";
-                                        }
                                         chessboard3.Set(piece_color + "_C", posLet, posNum);
                                         break;
                                     }
                                     case 5: {
-                                        std::string piece_color;
-                                        if (color) {
-                                            piece_color = "w";
-                                        } else {
-                                            piece_color = "b";
-                                        }
                                         chessboard3.Set(piece_color + "_Q", posLet, posNum);
                                         break;
                                     }
                                     case 6: {
-                                        std::string piece_color;
-                                        if (color) {
-                                            piece_color = "w";
-                                        } else {
-                                            piece_color = "b";
-                                        }
                                         chessboard3.Set(piece_color + "_K", posLet, posNum);
                                         break;
                                     }
@@ -791,27 +711,23 @@ int main(){
                     to_num = to_pos[1] - 49;
                     if (to_let > 8)
                         to_let -= 32;
-                    if (chessboard1.Get(to_let, to_num)[1] != '_'){
-                        bool sec_color = array[call(chessboard1.Get(to_let,to_num))].get_color();
-                        if (FirstPieceColor != sec_color) {
-                            first_piece = call(chessboard1.Get(from_let,from_num));
-                            if ((-1 < from_let < 8) and (-1 < from_num < 8) and (-1 < to_let < 8) and (-1 < to_num < 8)) {
-                                array[first_piece].movement(from_let, from_num, to_let, to_num, &PlayerSelector, &chessboard1, array);
-                                l = 1;
-                            } else
-                                std::cout << "Выход за границы доски";
-                        }else{
-                            from_pos = to_pos;
-                        }
-                    }else{
-                        first_piece = call(chessboard1.Get(from_let,from_num));
+                    first_piece = call(chessboard1.Get(from_let,from_num));
 
-                        if ((-1 < from_let < 8) and (-1 < from_num < 8) and (-1 < to_let < 8) and (-1 < to_num < 8)) {
-                            array[first_piece].movement(from_let, from_num, to_let, to_num, &PlayerSelector, &chessboard1, array);
+
+                    if ((-1 < from_let < 8) and (-1 < from_num < 8) and (-1 < to_let < 8) and (-1 < to_num < 8)) {
+                        if (chessboard1.Get(to_let, to_num)[1] != '_') {
+                            bool sec_color = array[call(chessboard1.Get(to_let, to_num))].get_color();
+                            if (FirstPieceColor != sec_color) {
+                                array[first_piece].movement(from_let, from_num, to_let, to_num, &PlayerSelector,
+                                                            &chessboard1, array);
+                                l = 1;
+                            } else from_pos = to_pos;
+                        } else {
+                            array[first_piece].movement(from_let, from_num, to_let, to_num, &PlayerSelector,
+                                                        &chessboard1, array);
                             l = 1;
-                        } else
-                            std::cout << "Выход за границы доски";
-                    }
+                        }
+                    } else std::cout << "Выход за границы доски";
 
                 }else{
                     std::cout << "Куда вне очереди\n";

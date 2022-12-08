@@ -82,9 +82,8 @@ public:
     /**используется для определения клеток chessboard на которые фигура может сходить
     на вход подаются координаты хода, на выходе выдается булево значение(может/не может)*/
 
-    bool
-    steps_permission(int from_let, int from_num, int to_let, int to_num, int PlayerSelector, chessboard *chessboard1,
-                     piece array[33]) {
+    bool steps_permission(int from_let, int from_num, int to_let, int to_num, int PlayerSelector,
+                          chessboard *chessboard1, piece array[33]) {
         int switch_piece = int(name[0]) - 48;
         bool switcher = false;
         switch (switch_piece) {
@@ -288,7 +287,7 @@ void fill_cell(short from_let, short from_num, int PlayerSelector, chessboard *c
 
 /**Вспомогательная функция для steps_prediction()*/
 void bishop_logic(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1,chessboard *chessboard2, chessboard *chessboard3, piece array[33], int to_let, int to_num, bool *barrier, bool king_flag){
-    if ((to_let < 8) and (to_num < 8)){
+    if ((to_let < 8) and (to_num < 8) and (to_let > -1) and (to_num > -1)) {
         if(chessboard1->Get(to_let,to_num) != "___"){
             if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
                 or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
@@ -343,7 +342,7 @@ void running_through_the_piece(std::string name, bool fircolor, bool *danger, sh
             if ((array[i].get_color() != fircolor)) {
                 int num, let;
                 array[i].get(&let, &num);
-                steps_prediction(num, let, PlayerSelector, chessboard1, chessboard2, chessboard3, array, true);
+                steps_prediction(let, num, PlayerSelector*-1, chessboard1, chessboard2, chessboard3, array, true);
             }
             if (chessboard2->Get(from_let,from_num)[1] == 'X'){
                 *danger = true;
@@ -381,27 +380,31 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             int to_let = from_let;
             int to_num = from_num + (-1 * PlayerSelector);
 
-            fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
-                           to_num,true, king_flag);
-
+            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
+                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
+                          to_num, true, king_flag);
+            }
             //на 2 вперёд
             to_let = from_let;
             to_num = from_num + (-2 * PlayerSelector);
-            fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
-                           to_num, true, king_flag);
-
+            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
+                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
+                          to_num, true, king_flag);
+            }
             //диагональ вправо на 1
             to_let = from_let + 1;
             to_num = from_num + (-1 * PlayerSelector);
-            fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
-                           to_num, false, king_flag);
-
+            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
+                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
+                          to_num, false, king_flag);
+            }
             //диагональ влево на 1
             to_let = from_let - 1;
             to_num = from_num + (-1 * PlayerSelector);
-            fill_cell(from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let,
-                           to_num, false, king_flag);
-
+            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
+                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
+                          to_num, false, king_flag);
+            }
             break;
         }
         //нужно исправить "ghost"а
@@ -454,60 +457,24 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             break;
         }
         case 6: {
-            /*int to_let = from_let - 1;
-            int to_num = from_num + 1;
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)){
-                if ((to_let < 6) and (to_num < 8)){
-                    for (int i = 0; i < 3; ++i) {
-                        king_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, king_flag);
-                        to_let++;
-                    }
-                }
-
-            }
-             */
             std::string name = chessboard1->Get(from_let,from_num);
             int to_let = from_let - 1;
-            int to_num = from_num + 1;
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)){
-                king_logic(name, from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, king_flag);
+            int to_num = from_num - 1;
+            int k = 0;
+            if (!king_flag) {
+                while (k < 8) {
+                    if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
+                        king_logic(name, from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3,
+                                   array, to_let, to_num, king_flag);
+                    }
+                    bool yx = (k % 4) / 2;
+                    int m;
+                    (k / 4 ? m = -1 : m = 1);
+                    to_num += m * !int(yx);
+                    to_let += m * int(yx);
+                    k++;
+                }
             }
-            to_let = from_let;
-            to_num = from_num + 1;
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)){
-                king_logic(name, from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, king_flag);
-            }
-            to_let = from_let + 1;
-            to_num = from_num + 1;
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)){
-                king_logic(name, from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, king_flag);
-            }
-            to_let = from_let + 1;
-            to_num = from_num ;
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)){
-                king_logic(name, from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, king_flag);
-            }
-            to_let = from_let + 1;
-            to_num = from_num - 1;
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)){
-                king_logic(name, from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, king_flag);
-            }
-            to_let = from_let;
-            to_num = from_num - 1;
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)){
-                king_logic(name, from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, king_flag);
-            }
-            to_let = from_let - 1;
-            to_num = from_num - 1;
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)){
-                king_logic(name, from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, king_flag);
-            }
-            to_let = from_let - 1;
-            to_num = from_num;
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)){
-                king_logic(name, from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, king_flag);
-            }
-
             break;
         }
 
@@ -686,13 +653,11 @@ int main(){
             std::cout << "Хотите ли вы добавить новую фигуру?\n";
             std::cin >> add_new_piece;
         }*/
-        fill(array, 31, 3, 4, "611");
-        fill(array, 6, 6, 6, "107");
+        fill(array, 31, 4, 0, "611");
         fill(array, 7, 3, 6, "108");
         fill(array, 8, 4, 3, "111");
         fill(array, 9, 1, 1, "112");
-        fill(array, 16, 2, 7, "201");
-        fill(array, 17, 5, 7, "202");
+        fill(array, 17, 2, 3, "202");
         fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
         chessboard3.render_view();
 
@@ -719,7 +684,6 @@ int main(){
         //chessboard1.render_predict();
         chessboard3.render_view();
         int first_piece, second_piece;
-
         int l = 0;
         std::cin >> from_pos;
         do{
@@ -786,3 +750,5 @@ int main(){
 
     return 0;
 }
+//Process finished with exit code -1073741571 (0xC00000FD)
+//d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e1

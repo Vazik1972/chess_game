@@ -308,6 +308,24 @@ void fill_cell(short from_let, short from_num, int PlayerSelector, chessboard *c
     }
 }
 
+void bishop_logic(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard3, piece array[33], int to_let, int to_num, bool *barrier){
+    if ((to_let < 8) and (to_num < 8)){
+        if(chessboard1->Get(to_let,to_num) != "___"){
+            if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
+                or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
+                *barrier = true;
+            }else{
+                fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                          to_num, false);
+                *barrier = true;
+            }
+        }else{
+            fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                      to_num, true);
+        }
+    }else *barrier = true;
+}
+
 //рендер возможных ходов
 void steps_prediction(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard3, piece array[33]){
     int switch_piece = int(chessboard1->Get(from_let,from_num)[0]) - 48;
@@ -348,22 +366,7 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             while (!barrier){
                 to_let++;
                 to_num++;
-                if ((to_let < 8) and (to_num < 8)){
-                    if(chessboard1->Get(to_let,to_num) != "___"){
-                        if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
-                            or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
-                            barrier = true;
-                        }else{
-                            fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
-                                      to_num, false);
-                            barrier = true;
-                        }
-                    }else{
-                        fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
-                                  to_num, true);
-                    }
-                }else barrier = true;
-
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard3, array, to_let, to_num, &barrier);
             }
 
             barrier = false;
@@ -372,22 +375,7 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             while (!barrier){
                 to_let--;
                 to_num++;
-                if ((to_let > -1) and (to_num < 8)){
-                    if(chessboard1->Get(to_let,to_num) != "___"){
-                        if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
-                            or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
-                            barrier = true;
-                        }else{
-                            fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
-                                      to_num, false);
-                            barrier = true;
-                        }
-                    }else{
-                        fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
-                                  to_num, true);
-                    }
-                }else barrier = true;
-
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard3, array, to_let, to_num, &barrier);
             }
             barrier = false;
             to_let = from_let;
@@ -395,22 +383,7 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             while (!barrier){
                 to_let++;
                 to_num--;
-                if ((to_let < 8) and (to_num > -1)){
-                    if(chessboard1->Get(to_let,to_num) != "___"){
-                        if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
-                            or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
-                            barrier = true;
-                        }else{
-                            fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
-                                      to_num, false);
-                            barrier = true;
-                        }
-                    }else{
-                        fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
-                                  to_num, true);
-                    }
-                }else barrier = true;
-
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard3, array, to_let, to_num, &barrier);
             }
             barrier = false;
             to_let = from_let;
@@ -418,22 +391,7 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             while (!barrier){
                 to_let--;
                 to_num--;
-                if ((to_let > -1) and (to_num > -1)){
-                    if(chessboard1->Get(to_let,to_num) != "___"){
-                        if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
-                            or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
-                            barrier = true;
-                        }else{
-                            fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
-                                      to_num, false);
-                            barrier = true;
-                        }
-                    }else{
-                        fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
-                                  to_num, true);
-                    }
-                }else barrier = true;
-
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard3, array, to_let, to_num, &barrier);
             }
             break;
         }

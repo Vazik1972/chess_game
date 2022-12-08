@@ -119,14 +119,6 @@ public:
 
                 break;
             }
-            case 2: {
-
-                break;
-            }
-            case 3: {
-
-                break;
-            }
             case 4: {
 
                 break;
@@ -141,6 +133,7 @@ public:
             }
 
             default: {
+                switcher = true;
                 break;
             }
         }
@@ -347,8 +340,101 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
 
             break;
         }
+        //нужно исправить "ghost"а
         case 2: {
+            bool barrier = false;
+            int to_let = from_let;
+            int to_num = from_num;
+            while (!barrier){
+                to_let++;
+                to_num++;
+                if ((to_let < 8) and (to_num < 8)){
+                    if(chessboard1->Get(to_let,to_num) != "___"){
+                        if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
+                            or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
+                            barrier = true;
+                        }else{
+                            fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                                      to_num, false);
+                            barrier = true;
+                        }
+                    }else{
+                        fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                                  to_num, true);
+                    }
+                }else barrier = true;
 
+            }
+
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_let--;
+                to_num++;
+                if ((to_let > -1) and (to_num < 8)){
+                    if(chessboard1->Get(to_let,to_num) != "___"){
+                        if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
+                            or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
+                            barrier = true;
+                        }else{
+                            fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                                      to_num, false);
+                            barrier = true;
+                        }
+                    }else{
+                        fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                                  to_num, true);
+                    }
+                }else barrier = true;
+
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_let++;
+                to_num--;
+                if ((to_let < 8) and (to_num > -1)){
+                    if(chessboard1->Get(to_let,to_num) != "___"){
+                        if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
+                            or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
+                            barrier = true;
+                        }else{
+                            fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                                      to_num, false);
+                            barrier = true;
+                        }
+                    }else{
+                        fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                                  to_num, true);
+                    }
+                }else barrier = true;
+
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_let--;
+                to_num--;
+                if ((to_let > -1) and (to_num > -1)){
+                    if(chessboard1->Get(to_let,to_num) != "___"){
+                        if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
+                            or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
+                            barrier = true;
+                        }else{
+                            fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                                      to_num, false);
+                            barrier = true;
+                        }
+                    }else{
+                        fill_cell(from_let, from_num, PlayerSelector, chessboard1,  chessboard3, array, to_let,
+                                  to_num, true);
+                    }
+                }else barrier = true;
+
+            }
             break;
         }
         case 3: {

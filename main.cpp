@@ -478,7 +478,66 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             break;
         }
         case 5: {
-
+            bool barrier = false;
+            int to_let = from_let;
+            int to_num = from_num;
+            while (!barrier){
+                to_let++;
+                to_num++;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_let--;
+                to_num++;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_let++;
+                to_num--;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_let--;
+                to_num--;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_let++;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_let--;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_num++;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_num--;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
             break;
         }
         case 6: {
@@ -656,38 +715,41 @@ int main(){
         chessboard3.render_view();
 
         /** Пофиксить баг с перестановкой фигуры */
-
-        bool add_new_piece = true;
-        while (add_new_piece){
-            std::string name;
-            short from_let, from_num;
-            std::string from_pos;
-            std::cout << "Введите код и координаты фигуры\n";
-            std::cin >> name >> from_pos;
-            int i = call(name);
-            if (from_pos == "-1"){
-                array[i].revive();
-            }else{
-                from_let = from_pos[0] - 65;
-                from_num = from_pos[1] - 49;
-                if (from_let > 8) from_let -= 32;
-                fill(array, i, from_let, from_num, name);
+        bool switcher = true;
+        std::cout << "Выберите мод\n";
+        std::cin>> switcher;
+        if(switcher){
+            bool add_new_piece = true;
+            while (add_new_piece){
+                std::string name;
+                short from_let, from_num;
+                std::string from_pos;
+                std::cout << "Введите код и координаты фигуры\n";
+                std::cin >> name >> from_pos;
+                int i = call(name);
+                if (from_pos == "-1"){
+                    array[i].revive();
+                }else{
+                    from_let = from_pos[0] - 65;
+                    from_num = from_pos[1] - 49;
+                    if (from_let > 8) from_let -= 32;
+                    fill(array, i, from_let, from_num, name);
+                }
+                fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
+                chessboard3.render_view();
+                std::cout << "Хотите ли вы добавить новую фигуру?\n";
+                std::cin >> add_new_piece;
             }
+        }else{
+            fill(array, 31, 4, 0, "611");
+            fill(array, 7, 3, 6, "108");
+            fill(array, 8, 4, 3, "111");
+            fill(array, 9, 1, 1, "112");
+            fill(array, 17, 2, 3, "202");
+            fill(array, 29, 3, 4, "511");
             fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
             chessboard3.render_view();
-            std::cout << "Хотите ли вы добавить новую фигуру?\n";
-            std::cin >> add_new_piece;
         }
-        /*
-        fill(array, 31, 4, 0, "611");
-        fill(array, 7, 3, 6, "108");
-        fill(array, 8, 4, 3, "111");
-        fill(array, 9, 1, 1, "112");
-        fill(array, 17, 2, 3, "202");
-        fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
-        chessboard3.render_view();
-         */
-
     }
 
     std::string from_pos, to_pos;

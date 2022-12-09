@@ -135,6 +135,9 @@ public:
         }
         return switcher;
     }
+    bool get_move(){
+        return this->moveCheck;
+    }
 
     bool get_color() {
         return this->color;
@@ -262,7 +265,7 @@ int call(std::string name){
 /**Вспомогательная функция для steps_prediction()
  * Используется для нанесения на предсказательные матрицы флагов (обозначающих: можно сходить,можно съесть)*/
 void fill_cell(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard2,
-               chessboard *chessboard3, piece array[33], int to_let, int to_num, bool switcher, bool king_flag){
+               chessboard *chessboard3, piece array[33], int to_let, int to_num, int switcher, bool king_flag){
     if (array[call(chessboard1->Get(from_let,from_num))].steps_permission(from_let,from_num,to_let,to_num, PlayerSelector,chessboard1,array)){
         std::string name;
         if (king_flag){
@@ -270,7 +273,11 @@ void fill_cell(short from_let, short from_num, int PlayerSelector, chessboard *c
         }else{
             name = chessboard3->Get(to_let,to_num);
         }
-        name[1] = (switcher?'$':'X');
+        if (switcher == 0){
+            name[1] = 'X';
+        }else if(switcher == 1){
+            name[1] = '$';
+        }else name[1] = 'O';
         if (king_flag){
             chessboard2->Set(name,to_let,to_num);
         }else{
@@ -542,6 +549,7 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
         }
         case 6: {
             std::string name = chessboard1->Get(from_let,from_num);
+            bool first_color = PlayerSelector == -1;
             int to_let = from_let - 1;
             int to_num = from_num - 1;
             int k = 0;
@@ -557,6 +565,60 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
                     to_num += m * !int(yx);
                     to_let += m * int(yx);
                     k++;
+                }
+
+                if (!array[call(name)].get_move()){
+                    to_let = from_let;
+                    to_num = from_num;
+                    bool barrier = false;
+                    for (int i = from_let + 1; i < 7; ++i) {
+                        if (chessboard1->Get(i,from_num) != "___"){
+                            barrier = true;
+                            break;
+                        }
+                    }
+                    if (!barrier){
+                        bool danger = false;
+                        for (int i = from_let + 1; i < 7; ++i) {
+                            if (check_danger(name, i, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array)){
+                                danger = true;
+                                break;
+                            }
+                        }
+                        if (!danger){
+                            if ((int(chessboard1->Get(7,from_num)[0])-48 == 4) and
+                                (!array[call(chessboard1->Get(7,from_num))].get_move())){
+                                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let+2,
+                                          to_num, 2, king_flag);
+                            }
+                        }
+                    }
+
+
+                    barrier = false;
+                    for (int i = from_let - 1; i > 0; --i) {
+                        if (chessboard1->Get(i,from_num) != "___"){
+                            barrier = true;
+                            break;
+                        }
+                    }
+                    if (!barrier){
+                        bool danger = false;
+                        for (int i = from_let - 1; i > 0; --i) {
+                            if (check_danger(name, i, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array)){
+                                danger = true;
+                                break;
+                            }
+                        }
+                        if (!danger){
+                            if ((int(chessboard1->Get(0,from_num)[0])-48 == 4) and
+                                (!array[call(chessboard1->Get(0,from_num))].get_move())){
+                                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let-2,
+                                          to_num, 2, king_flag);
+                            }
+                        }
+                    }
+
                 }
             }
             break;
@@ -703,8 +765,6 @@ int main(){
             array[i].kill();
         }
 
-
-
         fill_matrix(&chessboard1);
 
         fill_matrix(&chessboard3);
@@ -720,21 +780,28 @@ int main(){
         std::cin>> switcher;
         if(switcher){
             bool add_new_piece = true;
-            while (add_new_piece){
+            while (add_new_piece) {
                 std::string name;
                 short from_let, from_num;
                 std::string from_pos;
                 std::cout << "Введите код и координаты фигуры\n";
                 std::cin >> name >> from_pos;
                 int i = call(name);
-                if (from_pos == "-1"){
+                if (!array[i].get_death()) {
+                    array[i].kill();
+                    fill_matrix(&chessboard1);
+                    fill_matrix(&chessboard3);
+                    fill_matrix(&chessboard2);
+                }
+                if (from_pos == "-1") {
                     array[i].revive();
-                }else{
+                } else {
                     from_let = from_pos[0] - 65;
                     from_num = from_pos[1] - 49;
                     if (from_let > 8) from_let -= 32;
                     fill(array, i, from_let, from_num, name);
                 }
+
                 fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
                 chessboard3.render_view();
                 std::cout << "Хотите ли вы добавить новую фигуру?\n";
@@ -745,8 +812,11 @@ int main(){
             fill(array, 7, 3, 6, "108");
             fill(array, 8, 4, 3, "111");
             fill(array, 9, 1, 1, "112");
-            fill(array, 17, 2, 3, "202");
-            fill(array, 29, 3, 4, "511");
+            fill(array, 26, 0, 0, "411");
+            fill(array, 27, 7, 0, "412");
+            fill(array, 24, 0, 7, "401");
+            fill(array, 25, 7, 7, "402");
+            fill(array, 30, 4, 7, "601");
             fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
             chessboard3.render_view();
         }
@@ -831,11 +901,25 @@ int main(){
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
                                 l = 1;
-                            } else{
+                            } else if (chessboard3.Get(to_let, to_num)[1] == 'O'){
+                                array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
+                                                         &chessboard1, array);
+                                if (to_let/4){
+                                    array[call(chessboard1.Get(7,to_num))].mover(7, from_num, 5, to_num, &PlayerSelector,
+                                                                                 &chessboard1, array);
+                                }else{
+                                    array[call(chessboard1.Get(0,to_num))].mover(0, from_num, 3, to_num, &PlayerSelector,
+                                                                                 &chessboard1, array);
+                                }
+                                PlayerSelector *= -1;
+                                l = 1;
+                            }else{
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
                                 l = 1;
                             }
+
+
                         } else {
                             bool first_color = array[call(chessboard1.Get(from_let, from_num))].get_color();
                             if (int(chessboard1.Get(to_let, to_num)[1])-48 == first_color) {

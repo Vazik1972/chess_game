@@ -5,6 +5,8 @@
 //пук
 
 
+/** тест мержа на русском*/
+
 int call(std::string name);
 
 class chessboard;

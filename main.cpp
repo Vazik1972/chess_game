@@ -82,6 +82,7 @@ public:
     /**используется для определения клеток chessboard на которые фигура может сходить
     на вход подаются координаты хода, на выходе выдается булево значение(может/не может)*/
 
+    /** Скорее всего снанет специализированной функцией для пешки */
     bool steps_permission(int from_let, int from_num, int to_let, int to_num, int PlayerSelector,
                           chessboard *chessboard1, piece array[33]) {
         int switch_piece = int(name[0]) - 48;
@@ -200,15 +201,7 @@ private:
     std::string name;
 };
 
-/*
- 1st number:      2nd number:     3rd number:
- * 1 - pawn         0 - black       number of a piece
- * 2 - bishop       1 - white
- * 3 - knight
- * 4 - castle
- * 5 - queen
- * 6 - king
-*/
+
 
 class PlayerWhite {
 
@@ -218,7 +211,16 @@ class PlayerBlack {
 
 };
 
-
+/** Памятка по name фигуры */
+/*
+ 1st number:      2nd number:     3rd number:
+ * 1 - pawn         0 - black       number of a piece
+ * 2 - bishop       1 - white
+ * 3 - knight
+ * 4 - castle
+ * 5 - queen
+ * 6 - king
+*/
 
 /**заполнение фигур*/
 void fill(piece array[], int i, short posLet, short posNum, std::string Name){
@@ -267,7 +269,8 @@ int call(std::string name){
 
 /**Вспомогательная функция для steps_prediction()
  * Используется для нанесения на предсказательные матрицы флагов (обозначающих: можно сходить,можно съесть)*/
-void fill_cell(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[33], int to_let, int to_num, bool switcher, bool king_flag){
+void fill_cell(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard2,
+               chessboard *chessboard3, piece array[33], int to_let, int to_num, bool switcher, bool king_flag){
     if (array[call(chessboard1->Get(from_let,from_num))].steps_permission(from_let,from_num,to_let,to_num, PlayerSelector,chessboard1,array)){
         std::string name;
         if (king_flag){
@@ -286,7 +289,8 @@ void fill_cell(short from_let, short from_num, int PlayerSelector, chessboard *c
 }
 
 /**Вспомогательная функция для steps_prediction()*/
-void bishop_logic(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1,chessboard *chessboard2, chessboard *chessboard3, piece array[33], int to_let, int to_num, bool *barrier, bool king_flag){
+void bishop_logic(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1,chessboard *chessboard2,
+                  chessboard *chessboard3, piece array[33], int to_let, int to_num, bool *barrier, bool king_flag){
     if ((to_let < 8) and (to_num < 8) and (to_let > -1) and (to_num > -1)) {
         if(chessboard1->Get(to_let,to_num) != "___"){
             if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
@@ -326,7 +330,7 @@ void king_logic(std::string name,short from_let, short from_num, int PlayerSelec
 
 
 
-/**проход по всем фигурам(кроме пешек) и поиск той которая сможет съесть фигуру на данной клетке */
+/**проход по всем фигурам и поиск той, которая сможет съесть фигуру на данной клетке */
 void running_through_the_piece(std::string name, bool fircolor, bool *danger, short from_let, short from_num, int PlayerSelector, chessboard *chessboard1,chessboard *chessboard2, chessboard *chessboard3, piece array[33]){
     int king_let, king_num;
     array[call(name)].get(&king_let, &king_num);
@@ -407,7 +411,9 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             }
             break;
         }
-        //нужно исправить "ghost"а
+
+        /** Я бы переработал логику функций, уж больно всё хаотично */
+
         case 2: {
             bool barrier = false;
             int to_let = from_let;
@@ -619,9 +625,7 @@ int main(){
             array[i].kill();
         }
 
-        chessboard chessboard1; //подложная
-        chessboard chessboard2; //предсказательная для короля
-        chessboard chessboard3; //предсказательная
+
 
         fill_matrix(&chessboard1);
 
@@ -631,7 +635,9 @@ int main(){
 
         fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
         chessboard3.render_view();
-        /*
+
+        /** Пофиксить баг с перестановкой фигуры */
+
         bool add_new_piece = true;
         while (add_new_piece){
             std::string name;
@@ -652,7 +658,8 @@ int main(){
             chessboard3.render_view();
             std::cout << "Хотите ли вы добавить новую фигуру?\n";
             std::cin >> add_new_piece;
-        }*/
+        }
+        /*
         fill(array, 31, 4, 0, "611");
         fill(array, 7, 3, 6, "108");
         fill(array, 8, 4, 3, "111");
@@ -660,6 +667,7 @@ int main(){
         fill(array, 17, 2, 3, "202");
         fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
         chessboard3.render_view();
+         */
 
     }
 
@@ -686,6 +694,10 @@ int main(){
         int first_piece, second_piece;
         int l = 0;
         std::cin >> from_pos;
+        from_let = from_pos[0] - 65;
+        from_num = from_pos[1] - 49;
+        if (from_let > 8) from_let -= 32;
+
         do{
 
             /**перезаполнение предсказательной матрицы*/
@@ -693,25 +705,42 @@ int main(){
 
             /**переразмещение фигур на предсказательной матрице*/
             fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, false, true);
+
+
             /**перевод координат*/
             from_let = from_pos[0] - 65;
             from_num = from_pos[1] - 49;
             if (from_let > 8) from_let -= 32;
+
+            if (!array[32].get_death()) {
+                int temp_let, temp_num;
+                std::string temp_name;
+                array[32].get(&temp_let,&temp_num);
+                array[32].get(&temp_name);
+                if (chessboard1.Get(from_let,from_num)[0] == '1') {
+                    chessboard1.Set(temp_name, temp_let, temp_num);
+                } else {
+                    chessboard1.Set("___", temp_let, temp_num);
+                }
+            }
+
             if (chessboard1.Get(from_let,from_num)[1] != '_'){
                 bool FirstPieceColor = array[call(chessboard1.Get(from_let,from_num))].get_color();
                 if((int(FirstPieceColor) == -1 * PlayerSelector) or (PlayerSelector > int(FirstPieceColor))) {
+
                     steps_prediction(from_let, from_num, PlayerSelector, &chessboard1, &chessboard2, &chessboard3, array, false);
 
+                    chessboard1.render_predict();
                     chessboard3.render_predict();
 
-
+                    /**перевод координат*/
                     std::cin >> to_pos;
                     to_let = to_pos[0] - 65;
                     to_num = to_pos[1] - 49;
                     if (to_let > 8)
                         to_let -= 32;
-                    first_piece = call(chessboard1.Get(from_let,from_num));
 
+                    first_piece = call(chessboard1.Get(from_let,from_num));
 
                     if ((-1 < from_let < 8) and (-1 < from_num < 8) and (-1 < to_let < 8) and (-1 < to_num < 8)) {
                         if (chessboard3.Get(to_let, to_num)[1] != '_') {
@@ -728,7 +757,7 @@ int main(){
                             }
                         } else {
                             bool first_color = array[call(chessboard1.Get(from_let, from_num))].get_color();
-                            if(int(chessboard1.Get(to_let, to_num)[1])-48 == first_color) {
+                            if (int(chessboard1.Get(to_let, to_num)[1])-48 == first_color) {
                                 from_pos = to_pos;
                             }else std::cout << "Попробуйте другой ход\n";
                         }
@@ -747,8 +776,7 @@ int main(){
 
     }
 
-
     return 0;
 }
-//Process finished with exit code -1073741571 (0xC00000FD)
-//d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e1
+//Справедливости ради, даже при добавлении функционала бишопов и королей, объём кода всё равно меньше, чем до их добавления и рефакторинга.
+//d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e2 e4 h6

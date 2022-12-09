@@ -119,23 +119,15 @@ public:
                         }
                     }
                 }
-
-
                 break;
             }
-            case 4: {
-
-                break;
-            }
-            case 5: {
-
+            case 3:{
                 break;
             }
             case 6: {
                 switcher = true;
                 break;
             }
-
             default: {
                 switcher = true;
                 break;
@@ -455,7 +447,34 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             break;
         }
         case 4: {
-
+            bool barrier = false;
+            int to_let = from_let;
+            int to_num = from_num;
+            while (!barrier){
+                to_let++;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_let--;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_num++;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
+            barrier = false;
+            to_let = from_let;
+            to_num = from_num;
+            while (!barrier){
+                to_num--;
+                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            }
             break;
         }
         case 5: {

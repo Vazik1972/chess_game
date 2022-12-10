@@ -5,8 +5,6 @@
 //пук
 
 
-/** тест мержа на русском*/
-
 int call(std::string name);
 
 class chessboard;
@@ -121,9 +119,6 @@ public:
                         }
                     }
                 }
-                break;
-            }
-            case 3:{
                 break;
             }
             case 6: {
@@ -452,12 +447,28 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
         }
 
         case 3: {
+            bool barrier = false;
+            int to_let = from_let - 1;
+            int to_num = from_num - 2;
 
+            int i = 0;
+            while(i < 8){
+                if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
+                    fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
+                              to_num, true, king_flag);
+
+                }
+                int j = (i + 2) % 8;
+                /** даже не спрашивайте, как это работает*/
+                to_let += (((i + 1) % 2) * (((i / 2) % 2) * 2) + (i % 2)) * (!(i/4) - (i/4));
+                to_num += (((j + 1) % 2) * (((j / 2) % 2) * 2) + (j % 2)) * (!(j/4) - (j/4));
+                i++;
+            }
             break;
         }
         case 4: {
             bool barrier = false;
-            int to_let = from_let;
+            int to_let = from_let + bool(-1);
             int to_num = from_num;
             while (!barrier){
                 to_let++;
@@ -814,10 +825,8 @@ int main(){
             fill(array, 7, 3, 6, "108");
             fill(array, 8, 4, 3, "111");
             fill(array, 9, 1, 1, "112");
-            fill(array, 26, 0, 0, "411");
-            fill(array, 27, 7, 0, "412");
-            fill(array, 24, 0, 7, "401");
-            fill(array, 25, 7, 7, "402");
+            fill(array, 22, 1, 0, "311");
+            fill(array, 23, 6, 0, "312");
             fill(array, 30, 4, 7, "601");
             fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
             chessboard3.render_view();

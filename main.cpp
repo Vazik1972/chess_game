@@ -330,10 +330,13 @@ void king_logic(std::string name,short from_let, short from_num, int PlayerSelec
 void running_through_the_piece(std::string name, bool fircolor, bool *danger, short from_let, short from_num, int PlayerSelector, chessboard *chessboard1,chessboard *chessboard2, chessboard *chessboard3, piece array[33]){
     int king_let, king_num;
     array[call(name)].get(&king_let, &king_num);
-    chessboard2->Set(chessboard2->Get(king_let,king_num),from_let,from_num);
-    chessboard2->Set("___",king_let,king_num);
-    chessboard1->Set(name,from_let,from_num);
-    chessboard1->Set("___",king_let,king_num);
+    if ((king_let != from_let) and (king_num !=from_num)){
+        chessboard2->Set(chessboard2->Get(king_let,king_num),from_let,from_num);
+        chessboard2->Set("___",king_let,king_num);
+        chessboard1->Set(name,from_let,from_num);
+        chessboard1->Set("___",king_let,king_num);
+    }
+
     for (int i = 0; i < 32; ++i) {
         if (!array[i].get_death()){
             if (call(name) == i) continue;
@@ -710,6 +713,11 @@ void fill_matrix_piece(chessboard *chessboard1, chessboard *chessboard2, chessbo
     }
 }
 
+bool switch_check(std::string name, bool check){
+
+    return true;
+}
+
 int main(){
     SetConsoleOutputCP(CP_UTF8);
     bool switch_mod = true;
@@ -772,6 +780,9 @@ int main(){
     chessboard chessboard2; //предсказательная для короля
     chessboard chessboard3; //предсказательная
     int PlayerSelector = -1; //переменная вокруг которой построенно определение кто сейчас ходит
+    bool check = false;
+    bool check_mate = false;
+    std::string name_enemy = "___";
     if (!switch_mod){
 
         for (int i = 0; i < 32; ++i) {
@@ -837,7 +848,7 @@ int main(){
 
     short from_let, from_num, to_let, to_num;
 
-    while(from_pos != "-1"){
+    while((from_pos != "-1") or !check_mate){
 
         /**заполнение подложной матрицы*/
         fill_matrix(&chessboard1);
@@ -855,13 +866,19 @@ int main(){
         chessboard3.render_view();
         int first_piece, second_piece;
         int l = 0;
+        /*
+        if (check){
+            std::cout<< "шах\n";
+            std::string king_name;
+            (PlayerSelector == -1 ? king_name = "611" : king_name = "601");
+
+        }*/
         std::cin >> from_pos;
         from_let = from_pos[0] - 65;
         from_num = from_pos[1] - 49;
         if (from_let > 8) from_let -= 32;
 
         do{
-
             /**перезаполнение предсказательной матрицы*/
             fill_matrix(&chessboard3);
 
@@ -903,7 +920,7 @@ int main(){
                         to_let -= 32;
 
                     first_piece = call(chessboard1.Get(from_let,from_num));
-
+                    std::string name_enemy_king = "___";
                     if ((-1 < from_let < 8) and (-1 < from_num < 8) and (-1 < to_let < 8) and (-1 < to_num < 8)) {
                         if (chessboard3.Get(to_let, to_num)[1] != '_') {
 
@@ -911,22 +928,47 @@ int main(){
                                 array[second_piece].killer(to_let, to_num, &chessboard1, array);
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
+                                (PlayerSelector == -1 ? name_enemy_king = "611" : name_enemy_king = "601");
+                                int king_let, king_num;
+                                array[call(name_enemy_king)].get(&king_let, &king_num);
+                                if (check_danger(name_enemy_king,king_let, king_num,PlayerSelector,&chessboard1,&chessboard2,&chessboard3,array)){
+                                    check = true;
+                                    name_enemy = chessboard1.Get(from_let,from_num);
+                                }
                                 l = 1;
                             } else if (chessboard3.Get(to_let, to_num)[1] == 'O'){
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
+                                std::string name_castle;
                                 if (to_let/4){
-                                    array[call(chessboard1.Get(7,to_num))].mover(7, from_num, 5, to_num, &PlayerSelector,
+                                    name_castle = chessboard1.Get(7,to_num);
+                                    array[call(name_castle)].mover(7, from_num, 5, to_num, &PlayerSelector,
                                                                                  &chessboard1, array);
                                 }else{
-                                    array[call(chessboard1.Get(0,to_num))].mover(0, from_num, 3, to_num, &PlayerSelector,
+                                    name_castle = chessboard1.Get(0,to_num);
+                                    array[call(name_castle)].mover(0, from_num, 3, to_num, &PlayerSelector,
                                                                                  &chessboard1, array);
                                 }
                                 PlayerSelector *= -1;
+                                (PlayerSelector == -1 ? name_enemy_king = "611" : name_enemy_king = "601");
+                                int king_let, king_num;
+                                array[call(name_enemy_king)].get(&king_let, &king_num);
+                                if (check_danger(name_enemy_king,king_let, king_num,PlayerSelector,&chessboard1,&chessboard2,&chessboard3,array)){
+                                    check = true;
+                                    name_enemy = name_castle;
+                                }
+
                                 l = 1;
                             }else{
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
+                                (PlayerSelector == -1 ? name_enemy_king = "611" : name_enemy_king = "601");
+                                int king_let, king_num;
+                                array[call(name_enemy_king)].get(&king_let, &king_num);
+                                if (check_danger(name_enemy_king,king_let, king_num,PlayerSelector,&chessboard1,&chessboard2,&chessboard3,array)){
+                                    check = true;
+                                    name_enemy = chessboard1.Get(from_let,from_num);
+                                }
                                 l = 1;
                             }
 
@@ -954,5 +996,6 @@ int main(){
 
     return 0;
 }
+//Надо провести рефакторинг кода
 //Справедливости ради, даже при добавлении функционала бишопов и королей, объём кода всё равно меньше, чем до их добавления и рефакторинга.
 //d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e2 e4 h6

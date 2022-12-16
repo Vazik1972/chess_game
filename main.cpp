@@ -206,7 +206,7 @@ short call(std::string name){
 }
 
 /**Вспомогательная функция для steps_prediction()
- * Используется для нанесения на предсказательные матрицы флагов (обозначающих: можно сходить,можно съесть)*/
+ * Используется для нанесения на предсказательные матрицы флагов (обозначающих: можно сходить, можно съесть)*/
 void fill_cell(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2,
                chessboard *chessboard3, piece array[33], short to_let, short to_num, short switcher, bool king_flag) {
     std::string name;
@@ -226,7 +226,7 @@ void fill_cell(short from_let, short from_num, short PlayerSelector, chessboard 
         chessboard3->Set(name, to_let, to_num);
     }
 }
-/**Вспомогательная функция для пешек для steps_prediction*/
+/**Вспомогательная функция для пешек для steps_prediction()*/
 void pawn_logic(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1,chessboard *chessboard2,
                 chessboard *chessboard3, piece array[33], short to_let, short to_num, bool *barrier, bool king_flag, bool move_type){
     if ((to_let < 8) and (to_num < 8) and (to_let > -1) and (to_num > -1)) {
@@ -247,7 +247,7 @@ void pawn_logic(short from_let, short from_num, short PlayerSelector, chessboard
     }
 }
 
-/**Вспомогательная функция для фигур, которые ходят по прямой для steps_prediction*/
+/**Вспомогательная функция для фигур, которые ходят по прямой для steps_prediction()*/
 void beam_logic(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1,chessboard *chessboard2,
                   chessboard *chessboard3, piece array[33], short to_let, short to_num, bool *barrier, bool king_flag){
     if ((to_let < 8) and (to_num < 8) and (to_let > -1) and (to_num > -1)) {
@@ -370,37 +370,6 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
             to_num = from_num + (-1 * PlayerSelector);
             pawn_logic(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3,
                            array, to_let, to_num, &barrier, king_flag, false);
-
-            /*
-            //на 1 вперёд
-            short to_let = from_let;
-            short to_num = from_num + (-1 * PlayerSelector);
-
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
-                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
-                          to_num, true, king_flag);
-            }
-            //на 2 вперёд
-            to_let = from_let;
-            to_num = from_num + (-2 * PlayerSelector);
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
-                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
-                          to_num, true, king_flag);
-            }
-            //диагональ вправо на 1
-            to_let = from_let + 1;
-            to_num = from_num + (-1 * PlayerSelector);
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
-                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
-                          to_num, false, king_flag);
-            }
-            //диагональ влево на 1
-            to_let = from_let - 1;
-            to_num = from_num + (-1 * PlayerSelector);
-            if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
-                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
-                          to_num, false, king_flag);
-            }*/
             break;
         }
         case 2: {

@@ -5,15 +5,15 @@
 //пук
 
 
-int call(std::string name);
+short call(std::string name);
 
 class chessboard;
 
 class piece;
 void fill_matrix(chessboard *chessboard1);
-void steps_prediction(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[33], bool king_flag);
+void steps_prediction(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[33], bool king_flag);
 void fill_matrix_piece(chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[], bool flag, bool flag1);
-bool check_danger(std::string name, short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[]);
+bool check_danger(std::string name, short from_let, short from_num, short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[]);
 class chessboard {
 public:
 /**вывод доски с фигурами в консоль*/
@@ -48,11 +48,11 @@ public:
     }
 
 /**vec - обозначение фигур на доске или их отсутствие*/
-    void Set(std::string vec, int i, int j){
+    void Set(std::string vec, short i, short j){
         matrix[i][j] = vec;
     }
 
-    std::string Get(int i, int j){
+    std::string Get(short i, short j){
         return matrix[i][j];
     }
 private:
@@ -63,75 +63,21 @@ private:
 class piece {
 public:
     static void killer(short to_let, short to_num, chessboard *chessboard1, piece array[33]) {
-        int second_piece = call(chessboard1->Get(to_let, to_num));
+        short second_piece = call(chessboard1->Get(to_let, to_num));
         array[second_piece].kill();
     }
 
-    void mover(short from_let, short from_num, short to_let, short to_num, int *PlayerSelector, chessboard *chessboard1,
+    void mover(short from_let, short from_num, short to_let, short to_num, short *PlayerSelector, chessboard *chessboard1,
                piece array[33]) {
-        int first_piece = call(chessboard1->Get(from_let, from_num));
+        short first_piece = call(chessboard1->Get(from_let, from_num));
         array[first_piece].set(to_let, to_num);
         this->moveCheck = true;
         *PlayerSelector *= -1;
-        if (((int(name[0]) - 48) == 1) and (abs(from_num - to_num) == 2)) {
+        if (((short(name[0]) - 48) == 1) and (abs(from_num - to_num) == 2)) {
             array[32].revive(to_let, to_num - *PlayerSelector, array[call(chessboard1->Get(from_let, from_num))].name);
         } else array[32].kill();
     }
 
-
-    /**используется для определения клеток chessboard на которые фигура может сходить
-    на вход подаются координаты хода, на выходе выдается булево значение(может/не может)*/
-
-    /** Скорее всего снанет специализированной функцией для пешки */
-    bool steps_permission(int from_let, int from_num, int to_let, int to_num, int PlayerSelector,
-                          chessboard *chessboard1, piece array[33]) {
-        int switch_piece = int(name[0]) - 48;
-        bool switcher = false;
-        switch (switch_piece) {
-            case 1: {
-                if (((to_num - from_num) == PlayerSelector * -1) and (abs(to_let - from_let) == 1)) {
-                    if (chessboard1->Get(to_let, to_num)[1] != '_') {
-                        int first_piece = call(chessboard1->Get(from_let, from_num));
-                        int second_piece = call(chessboard1->Get(to_let, to_num));
-                        if (array[first_piece].color != array[second_piece].color) {
-                            switcher = true;
-                        }
-                    }
-                } else {
-                    if (moveCheck) {
-                        if ((from_let == to_let) and (from_num - PlayerSelector == to_num)) {
-                            if (chessboard1->Get(to_let, to_num)[1] == '_') {
-                                switcher = true;
-                            }
-                        }
-                    } else {
-                        if ((from_let == to_let) and
-                            ((from_num - PlayerSelector == to_num) or (from_num - 2 * PlayerSelector == to_num))) {
-                            if (chessboard1->Get(to_let, to_num)[1] == '_') {
-                                if (to_num - from_num == -2 * PlayerSelector) {
-                                    if (chessboard1->Get(to_let, to_num + PlayerSelector)[1] == '_') {
-                                        switcher = true;
-                                    }
-                                } else {
-                                    switcher = true;
-                                }
-                            }
-                        }
-                    }
-                }
-                break;
-            }
-            case 6: {
-                switcher = true;
-                break;
-            }
-            default: {
-                switcher = true;
-                break;
-            }
-        }
-        return switcher;
-    }
     bool get_move(){
         return this->moveCheck;
     }
@@ -144,7 +90,7 @@ public:
         *name = this->name;
     }
 
-    void get(int *posLet, int *posNum) {
+    void get(short *posLet, short *posNum) {
         *posLet = this->posLet;
         *posNum = this->posNum;
     }
@@ -215,17 +161,17 @@ class PlayerBlack {
 */
 
 /**заполнение фигур*/
-void fill(piece array[], int i, short posLet, short posNum, std::string Name){
-    bool color = int(Name[1]) - 48;
+void fill(piece array[], short i, short posLet, short posNum, std::string Name){
+    bool color = short(Name[1]) - 48;
     array[i].set(posLet, posNum, Name, false, color);
 }
 
 /** на вход получаем имя фигуры, на выход - номер в массиве */
-int call(std::string name){
+short call(std::string name){
     bool color = name[1] - 48;
-    int piece_ord = name[2] - 48;
-    int piece_number = -1;
-    int switch_piece = name[0] - 48;
+    short piece_ord = name[2] - 48;
+    short piece_number = -1;
+    short switch_piece = name[0] - 48;
     switch (switch_piece) {
         case 1:{
             piece_number = color * 8 + piece_ord - 1;
@@ -261,42 +207,57 @@ int call(std::string name){
 
 /**Вспомогательная функция для steps_prediction()
  * Используется для нанесения на предсказательные матрицы флагов (обозначающих: можно сходить,можно съесть)*/
-void fill_cell(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard2,
-               chessboard *chessboard3, piece array[33], int to_let, int to_num, int switcher, bool king_flag){
-    if (array[call(chessboard1->Get(from_let,from_num))].steps_permission(from_let,from_num,to_let,to_num, PlayerSelector,chessboard1,array)){
-        std::string name;
-        if (king_flag){
-            name = chessboard2->Get(to_let,to_num);
-        }else{
-            name = chessboard3->Get(to_let,to_num);
+void fill_cell(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2,
+               chessboard *chessboard3, piece array[33], short to_let, short to_num, short switcher, bool king_flag) {
+    std::string name;
+    if (king_flag) {
+        name = chessboard2->Get(to_let, to_num);
+    } else {
+        name = chessboard3->Get(to_let, to_num);
+    }
+    if (switcher == 0) {
+        name[1] = 'X';
+    } else if (switcher == 1) {
+        name[1] = '$';
+    } else name[1] = 'O';
+    if (king_flag) {
+        chessboard2->Set(name, to_let, to_num);
+    } else {
+        chessboard3->Set(name, to_let, to_num);
+    }
+}
+/**Вспомогательная функция для пешек для steps_prediction*/
+void pawn_logic(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1,chessboard *chessboard2,
+                chessboard *chessboard3, piece array[33], short to_let, short to_num, bool *barrier, bool king_flag, bool move_type){
+    if ((to_let < 8) and (to_num < 8) and (to_let > -1) and (to_num > -1)) {
+        if (move_type) {
+            //хождение вперёд
+            if (chessboard1->Get(to_let,to_num) == "___") {
+                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2,  chessboard3, array, to_let,
+                          to_num, true, king_flag);
+            } else *barrier = true;
+        } else {
+            //съедение
+            if (short(chessboard1->Get(to_let, to_num)[1]) - 48 == -1 * PlayerSelector - 1
+                or PlayerSelector == short(chessboard1->Get(to_let, to_num)[1]) - 48) {
+                fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2,  chessboard3, array, to_let,
+                          to_num, false, king_flag);
+            }
         }
-        if (switcher == 0){
-            name[1] = 'X';
-        }else if(switcher == 1){
-            name[1] = '$';
-        }else name[1] = 'O';
-        if (king_flag){
-            chessboard2->Set(name,to_let,to_num);
-        }else{
-            chessboard3->Set(name,to_let,to_num);
-        }
-
     }
 }
 
-/**Вспомогательная функция для steps_prediction()*/
-void bishop_logic(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1,chessboard *chessboard2,
-                  chessboard *chessboard3, piece array[33], int to_let, int to_num, bool *barrier, bool king_flag){
+/**Вспомогательная функция для фигур, которые ходят по прямой для steps_prediction*/
+void beam_logic(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1,chessboard *chessboard2,
+                  chessboard *chessboard3, piece array[33], short to_let, short to_num, bool *barrier, bool king_flag){
     if ((to_let < 8) and (to_num < 8) and (to_let > -1) and (to_num > -1)) {
         if(chessboard1->Get(to_let,to_num) != "___"){
-            if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
-                or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)) {
-                *barrier = true;
-            }else{
+            if (int(chessboard1->Get(to_let, to_num)[1]) - 48 != -1 * PlayerSelector
+                and PlayerSelector <= int(chessboard1->Get(to_let, to_num)[1]) - 48) {
                 fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2,  chessboard3, array, to_let,
                           to_num, false, king_flag);
-                *barrier = true;
             }
+            *barrier = true;
         }else{
             fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2,  chessboard3, array, to_let,
                       to_num, true, king_flag);
@@ -304,13 +265,10 @@ void bishop_logic(short from_let, short from_num, int PlayerSelector, chessboard
     }else *barrier = true;
 }
 
-/**Вспомогательная функция для steps_prediction()*/
-void king_logic(std::string name,short from_let, short from_num, int PlayerSelector, chessboard *chessboard1,chessboard *chessboard2, chessboard *chessboard3, piece array[33], int to_let, int to_num, bool king_flag){
+/**Вспомогательная функция для короля для steps_prediction()*/
+void king_logic(std::string name,short from_let, short from_num, short PlayerSelector, chessboard *chessboard1,chessboard *chessboard2, chessboard *chessboard3, piece array[33], short to_let, short to_num, bool king_flag){
     if(chessboard1->Get(to_let,to_num) != "___"){
-        if ((int(chessboard1->Get(to_let,to_num)[1])-48 == -1 * PlayerSelector)
-            or (PlayerSelector > int(chessboard1->Get(to_let,to_num)[1])-48)){
-
-        }else{
+        if ((short(chessboard1->Get(to_let,to_num)[1])-48 != -1 * PlayerSelector) and (PlayerSelector <= short(chessboard1->Get(to_let,to_num)[1])-48)){
             if (!check_danger(name,to_let,to_num,PlayerSelector,chessboard1,chessboard2,chessboard3, array)){
                 fill_cell(from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let,
                           to_num, false, king_flag);
@@ -327,8 +285,8 @@ void king_logic(std::string name,short from_let, short from_num, int PlayerSelec
 
 
 /**проход по всем фигурам и поиск той, которая сможет съесть фигуру на данной клетке */
-void running_through_the_piece(std::string name, bool fircolor, bool *danger, short from_let, short from_num, int PlayerSelector, chessboard *chessboard1,chessboard *chessboard2, chessboard *chessboard3, piece array[33]){
-    int king_let, king_num;
+void running_through_the_piece(std::string name, bool fircolor, bool *danger, short from_let, short from_num, short PlayerSelector, chessboard *chessboard1,chessboard *chessboard2, chessboard *chessboard3, piece array[33]){
+    short king_let, king_num;
     array[call(name)].get(&king_let, &king_num);
     if ((king_let != from_let) and (king_num !=from_num)){
         chessboard2->Set(chessboard2->Get(king_let,king_num),from_let,from_num);
@@ -337,13 +295,13 @@ void running_through_the_piece(std::string name, bool fircolor, bool *danger, sh
         chessboard1->Set("___",king_let,king_num);
     }
 
-    for (int i = 0; i < 32; ++i) {
+    for (short i = 0; i < 32; ++i) {
         if (!array[i].get_death()){
             if (call(name) == i) continue;
             std::string name1;
             array[i].get(&name1);
             if ((array[i].get_color() != fircolor)) {
-                int num, let;
+                short num, let;
                 array[i].get(&let, &num);
                 steps_prediction(let, num, PlayerSelector*-1, chessboard1, chessboard2, chessboard3, array, true);
             }
@@ -361,27 +319,62 @@ void running_through_the_piece(std::string name, bool fircolor, bool *danger, sh
 
 
 /**Проверка на то, находится ли данная клетка под ударом*/
-bool check_danger(std::string name, short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[]) {
+//Я перестал понимать, как функция работает
+bool check_danger(std::string name, short from_let, short from_num, short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[]) {
     bool danger = false;
     bool firstcolor = PlayerSelector == -1;
-    int to_num = from_num - PlayerSelector;
-    int to_let = from_let;
+    short to_num = from_num - PlayerSelector;
+    short to_let = from_let;
     running_through_the_piece(name, firstcolor, &danger, from_let, from_num, PlayerSelector, chessboard1,
                               chessboard2, chessboard3, array);
     return danger;
 }
 
 
-
+void king_tracing(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[33], bool king_flag){
+    short switch_piece = 1;
+    while (switch_piece < 7) {
+        steps_prediction(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, king_flag);
+        /**заброшено на время переработки steps_prediction*/
+        switch_piece++;
+    }
+}
 
 /**рендер возможных ходов*/
-void steps_prediction(short from_let, short from_num, int PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[33], bool king_flag){
-    int switch_piece = int(chessboard1->Get(from_let,from_num)[0]) - 48;
+void steps_prediction(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[33], bool king_flag){
+    //вынести отсюда свитч_пис наружу, чтобы можно было вызывать логику отдельной фигуры вне зависимости от того, какая фигура ходит
+    short switch_piece = short(chessboard1->Get(from_let,from_num)[0]) - 48;
     switch (switch_piece) {
         case 1: {
             //на 1 вперёд
-            int to_let = from_let;
-            int to_num = from_num + (-1 * PlayerSelector);
+            bool barrier = false;
+            short to_let = from_let;
+            short to_num = from_num + (-1 * PlayerSelector);
+            pawn_logic(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3,
+                           array, to_let, to_num, &barrier, king_flag, true);
+            //на 2 вперёд
+            if (!barrier and !array[call(chessboard1->Get(from_let, from_num))].get_move()) {
+                to_let = from_let;
+                to_num = from_num + (-2 * PlayerSelector);
+                pawn_logic(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3,
+                               array, to_let, to_num, &barrier, king_flag, true);
+            }
+            //диагональ вправо на 1
+            to_let = from_let + 1;
+            to_num = from_num + (-1 * PlayerSelector);
+            pawn_logic(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3,
+                           array, to_let, to_num, &barrier, king_flag, false);
+
+            //диагональ влево на 1
+            to_let = from_let - 1;
+            to_num = from_num + (-1 * PlayerSelector);
+            pawn_logic(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3,
+                           array, to_let, to_num, &barrier, king_flag, false);
+
+            /*
+            //на 1 вперёд
+            short to_let = from_let;
+            short to_num = from_num + (-1 * PlayerSelector);
 
             if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
                 fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
@@ -407,61 +400,39 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
                 fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
                           to_num, false, king_flag);
-            }
+            }*/
             break;
         }
-
-        /** Я бы переработал логику функций, уж больно всё хаотично */
-
         case 2: {
+            short k = 0;
             bool barrier = false;
-            int to_let = from_let;
-            int to_num = from_num;
-            while (!barrier){
-                to_let++;
-                to_num++;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_let--;
-                to_num++;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_let++;
-                to_num--;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_let--;
-                to_num--;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            while (k < 4) {
+                short l = (k + 1) % 4;
+                short to_let = from_let;
+                short to_num = from_num;
+                while (!barrier) {
+                    to_let += k / 2 + !(k / 2) * -1;
+                    to_num += l / 2 + !(l / 2) * -1;
+                    beam_logic(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3,
+                                 array, to_let, to_num, &barrier, king_flag);
+                }
+                barrier = false;
+                k++;
             }
             break;
         }
-
         case 3: {
             bool barrier = false;
-            int to_let = from_let - 1;
-            int to_num = from_num - 2;
+            short to_let = from_let - 2;
+            short to_num = from_num - 1;
 
-            int i = 0;
+            short i = 0;
             while(i < 8){
                 if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
-                    fill_cell(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let,
-                              to_num, true, king_flag);
+                    beam_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
 
                 }
-                int j = (i + 2) % 8;
+                short j = (i + 2) % 8;
                 /** даже не спрашивайте, как это работает*/
                 to_let += (((i + 1) % 2) * (((i / 2) % 2) * 2) + (i % 2)) * (!(i/4) - (i/4));
                 to_num += (((j + 1) % 2) * (((j / 2) % 2) * 2) + (j % 2)) * (!(j/4) - (j/4));
@@ -470,105 +441,47 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             break;
         }
         case 4: {
+            short k = 0;
             bool barrier = false;
-            int to_let = from_let + bool(-1);
-            int to_num = from_num;
-            while (!barrier){
-                to_let++;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_let--;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_num++;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_num--;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            while (k < 4) {
+                short l = (k + 1) % 4;
+                short to_let = from_let;
+                short to_num = from_num;
+                while (!barrier) {
+                    to_let += (k / 2 + !(k / 2) * -1) * !(k % 2);
+                    to_num += (l / 2 + !(l / 2) * -1) * !(l % 2);
+                    beam_logic(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3,
+                                 array, to_let, to_num, &barrier, king_flag);
+                }
+                barrier = false;
+                k++;
             }
             break;
         }
         case 5: {
+            short k = 0;
             bool barrier = false;
-            int to_let = from_let;
-            int to_num = from_num;
-            while (!barrier){
-                to_let++;
-                to_num++;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_let--;
-                to_num++;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_let++;
-                to_num--;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_let--;
-                to_num--;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_let++;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_let--;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_num++;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
-            }
-            barrier = false;
-            to_let = from_let;
-            to_num = from_num;
-            while (!barrier){
-                to_num--;
-                bishop_logic( from_let, from_num, PlayerSelector, chessboard1,chessboard2, chessboard3, array, to_let, to_num, &barrier, king_flag);
+            while (k < 8) {
+                short l = (k + 2) % 8;
+                short to_let = from_let;
+                short to_num = from_num;
+                while (!barrier) {
+                    to_let += (k / 4 + !(k / 4) * -1) * bool((k + 1) % 4);
+                    to_num += (l / 4 + !(l / 4) * -1) * bool((l + 1) % 4);
+                    beam_logic(from_let, from_num, PlayerSelector, chessboard1, chessboard2, chessboard3,
+                                 array, to_let, to_num, &barrier, king_flag);
+                }
+                barrier = false;
+                k++;
             }
             break;
         }
         case 6: {
             std::string name = chessboard1->Get(from_let,from_num);
             bool first_color = PlayerSelector == -1;
-            int to_let = from_let - 1;
-            int to_num = from_num - 1;
-            int k = 0;
+            short to_let = from_let - 1;
+            short to_num = from_num - 1;
+            short k = 0;
             if (!king_flag) {
                 while (k < 8) {
                     if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
@@ -639,7 +552,6 @@ void steps_prediction(short from_let, short from_num, int PlayerSelector, chessb
             }
             break;
         }
-
         default: {
             break;
         }
@@ -653,17 +565,18 @@ void fill_matrix(chessboard *chessboard1){
         }
     }
 }
+
 /**размещение фигур на матрице(в зависимости от значений flag и flag1) */
 void fill_matrix_piece(chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[], bool flag, bool flag1){
     for (short i = 0; i < 33; ++i) {
-        int posLet, posNum;
+        short posLet, posNum;
         bool color;
         std::string name;
         color = array[i].get_color();
         array[i].get(&posLet, &posNum);
         array[i].get(&name);
         if (array[i].get_death() == 0){
-            int switch_piece = int(name[0]) - 48;
+            short switch_piece = short(name[0]) - 48;
             std::string piece_color;
             if (color){
                 piece_color = "w";
@@ -673,41 +586,37 @@ void fill_matrix_piece(chessboard *chessboard1, chessboard *chessboard2, chessbo
             if (flag) chessboard1->Set(name,posLet, posNum);
             switch (switch_piece) {
                 case 1:{
-                    if (i!=32){
-                        if (flag1) chessboard3->Set(piece_color + "_P",posLet, posNum);
-                        chessboard2->Set(piece_color + "_P",posLet, posNum);
-                    }
+                    piece_color += "_P";
                     break;
                 }
                 case 2:{
-                    if (flag1) chessboard3->Set(piece_color + "_B",posLet, posNum);
-                    chessboard2->Set(piece_color + "_B",posLet, posNum);
+                    piece_color += "_B";
                     break;
                 }
                 case 3:{
-                    if (flag1) chessboard3->Set(piece_color + "_N",posLet, posNum);
-                    chessboard2->Set(piece_color + "_N",posLet, posNum);
+                    piece_color += "_N";
                     break;
                 }
                 case 4:{
-                    if (flag1) chessboard3->Set(piece_color + "_C",posLet, posNum);
-                    chessboard2->Set(piece_color + "_C",posLet, posNum);
+                    piece_color += "_C";
                     break;
                 }
                 case 5:{
-                    if (flag1) chessboard3->Set(piece_color + "_Q",posLet, posNum);
-                    chessboard2->Set(piece_color + "_Q",posLet, posNum);
+                    piece_color += "_Q";
                     break;
                 }
                 case 6:{
-                    if (flag1) chessboard3->Set(piece_color + "_K",posLet, posNum);
-                    chessboard2->Set(piece_color + "_K",posLet, posNum);
+                    piece_color += "_K";
                     break;
                 }
 
                 default:{
                     break;
                 }
+            }
+            if (i!=32) {
+                if (flag1) chessboard3->Set(piece_color, posLet, posNum);
+                chessboard2->Set(piece_color, posLet, posNum);
             }
         }
     }
@@ -779,13 +688,13 @@ int main(){
     chessboard chessboard1; //подложная
     chessboard chessboard2; //предсказательная для короля
     chessboard chessboard3; //предсказательная
-    int PlayerSelector = -1; //переменная вокруг которой построенно определение кто сейчас ходит
+    short PlayerSelector = -1; //переменная вокруг которой построенно определение кто сейчас ходит
     bool check = false;
     bool check_mate = false;
     std::string name_enemy = "___";
     if (!switch_mod){
 
-        for (int i = 0; i < 32; ++i) {
+        for (short i = 0; i < 32; ++i) {
             array[i].kill();
         }
 
@@ -839,6 +748,12 @@ int main(){
             fill(array, 22, 1, 0, "311");
             fill(array, 23, 6, 0, "312");
             fill(array, 30, 4, 7, "601");
+            fill(array, 28, 0, 4, "501");
+            fill(array, 29, 3, 0, "511");
+            fill(array, 24, 0, 7, "401");
+            fill(array, 25, 7, 7, "402");
+            fill(array, 26, 0, 0, "411");
+            fill(array, 27, 7, 0, "412");
             fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true);
             chessboard3.render_view();
         }
@@ -864,8 +779,8 @@ int main(){
 
         //chessboard1.render_predict();
         chessboard3.render_view();
-        int first_piece, second_piece;
-        int l = 0;
+        short first_piece, second_piece;
+        bool l = false;
         /*
         if (check){
             std::cout<< "шах\n";
@@ -892,7 +807,7 @@ int main(){
             if (from_let > 8) from_let -= 32;
 
             if (!array[32].get_death()) {
-                int temp_let, temp_num;
+                short temp_let, temp_num;
                 std::string temp_name;
                 array[32].get(&temp_let,&temp_num);
                 array[32].get(&temp_name);
@@ -909,7 +824,7 @@ int main(){
 
                     steps_prediction(from_let, from_num, PlayerSelector, &chessboard1, &chessboard2, &chessboard3, array, false);
 
-                    chessboard1.render_predict();
+                    //chessboard2.render_predict();
                     chessboard3.render_predict();
 
                     /**перевод координат*/
@@ -929,13 +844,13 @@ int main(){
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
                                 (PlayerSelector == -1 ? name_enemy_king = "611" : name_enemy_king = "601");
-                                int king_let, king_num;
+                                short king_let, king_num;
                                 array[call(name_enemy_king)].get(&king_let, &king_num);
                                 if (check_danger(name_enemy_king,king_let, king_num,PlayerSelector,&chessboard1,&chessboard2,&chessboard3,array)){
                                     check = true;
                                     name_enemy = chessboard1.Get(from_let,from_num);
                                 }
-                                l = 1;
+                                l = true;
                             } else if (chessboard3.Get(to_let, to_num)[1] == 'O'){
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
@@ -951,25 +866,25 @@ int main(){
                                 }
                                 PlayerSelector *= -1;
                                 (PlayerSelector == -1 ? name_enemy_king = "611" : name_enemy_king = "601");
-                                int king_let, king_num;
+                                short king_let, king_num;
                                 array[call(name_enemy_king)].get(&king_let, &king_num);
                                 if (check_danger(name_enemy_king,king_let, king_num,PlayerSelector,&chessboard1,&chessboard2,&chessboard3,array)){
                                     check = true;
                                     name_enemy = name_castle;
                                 }
 
-                                l = 1;
+                                l = true;
                             }else{
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
                                 (PlayerSelector == -1 ? name_enemy_king = "611" : name_enemy_king = "601");
-                                int king_let, king_num;
+                                short king_let, king_num;
                                 array[call(name_enemy_king)].get(&king_let, &king_num);
                                 if (check_danger(name_enemy_king,king_let, king_num,PlayerSelector,&chessboard1,&chessboard2,&chessboard3,array)){
                                     check = true;
                                     name_enemy = chessboard1.Get(from_let,from_num);
                                 }
-                                l = 1;
+                                l = true;
                             }
 
 
@@ -983,19 +898,18 @@ int main(){
 
                 }else{
                     std::cout << "Куда вне очереди\n";
-                    l = 1;
+                    l = true;
                 }
             }else{
                 std::cout << "Выберите фигуру\n";\
-                l = 1;
+                l = true;
             }
 
-        }while ( l != 1);
+        }while (!l);
 
     }
 
     return 0;
 }
 //Надо провести рефакторинг кода
-//Справедливости ради, даже при добавлении функционала бишопов и королей, объём кода всё равно меньше, чем до их добавления и рефакторинга.
 //d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e2 e4 h6

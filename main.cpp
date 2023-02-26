@@ -17,34 +17,55 @@ class chessboard {
 public:
 /**вывод доски с фигурами в консоль*/
     void render_view() {
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         for (short i = 7; i > -1; --i) {
+            SetConsoleTextAttribute(hConsole, 14);
             std::cout << i + 1 << "  ";
             for (short j = 0; j < 8; ++j) {
-                std::cout << matrix[j][i][0] << matrix[j][i][2] << " ";
+                if (matrix[j][i][0] == 'b') {
+                    SetConsoleTextAttribute(hConsole, 1);
+                }else {
+                    SetConsoleTextAttribute(hConsole, 7);
+                }
+                std::cout << matrix[j][i][2] << "  ";
             }
             std::cout << "\n";
         }
         std::cout << "  ";
         for (int i = 0; i < 8; ++i) {
+            SetConsoleTextAttribute(hConsole, 14);
             std::cout << " " << char(i + 65) << " ";
         }
         std::cout << "\n";
     }
 
 
+
+
     void render_predict() {
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         for (short i = 7; i > -1; --i) {
+            SetConsoleTextAttribute(hConsole, 14);
             std::cout << i + 1 << "  ";
             for (short j = 0; j < 8; ++j) {
-               // HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-               // SetConsoleTextAttribute(hConsole, 2);
-                std::cout << matrix[j][i] << " ";
+                if (matrix[j][i][0] == 'b') {
+                    SetConsoleTextAttribute(hConsole, 1);
+                }else {
+                    SetConsoleTextAttribute(hConsole, 15);
+                }
+                if (matrix[j][i][1] == '$'){
+                    SetConsoleTextAttribute(hConsole, 10);
+                }else if (matrix[j][i][1] == 'X'){
+                    SetConsoleTextAttribute(hConsole, 4);
+                }
+                std::cout << matrix[j][i][2] << "  ";
             }
             std::cout << "\n";
         }
         std::cout << "  ";
         for (int i = 0; i < 8; ++i) {
-            std::cout << "  " << char(i + 65) << " ";
+            SetConsoleTextAttribute(hConsole, 14);
+            std::cout << " " << char(i + 65) << " ";
         }
         std::cout << "\n";
     }

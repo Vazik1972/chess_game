@@ -1,6 +1,9 @@
 #include <iostream>
 #include <string>
 #include <Windows.h>
+#include <fstream>
+#include <ctime>
+
 
 //пук хрюк
 
@@ -38,9 +41,6 @@ public:
         }
         std::cout << "\n";
     }
-
-
-
 
     void render_predict() {
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -122,6 +122,10 @@ public:
         return this->death;
     }
 
+    bool get_pin() {
+        return this->is_pinned;
+    }
+
     void kill() {
         this->death = true;
     }
@@ -140,6 +144,15 @@ public:
     void set(std::string name) {
         this->name = name;
     }
+    void set(short posLet, short posNum, std::string name, bool moveCheck, bool color, bool death, bool is_pinned) {
+        this->posLet = posLet;
+        this->posNum = posNum;
+        this->name = name;
+        this->moveCheck = moveCheck;
+        this->color = color;
+        this->death = death;
+        this->is_pinned = is_pinned;
+    }
 
     void set(short posLet, short posNum, std::string name, bool moveCheck, bool color) {
         this->posLet = posLet;
@@ -148,6 +161,7 @@ public:
         this->moveCheck = moveCheck;
         this->color = color;
         this->death = false;
+        this->is_pinned = false;
     }
 
     void set(short posLet, short posNum) {
@@ -168,17 +182,6 @@ private:
     short posLet, posNum;
     std::string name;
 };
-
-
-
-class PlayerWhite {
-
-};
-
-class PlayerBlack {
-
-};
-
 
 /** Памятка по name фигуры */
 /*
@@ -284,8 +287,18 @@ bool pawn_logic(short PlayerSelector, chessboard *chessboard1, short to_let, sho
     return fill;
 }
 
+
+bool pinner(bool *barrier, chessboard *chessboard1, piece array, short let, short num){
+    bool flag = false;
+
+
+
+    return flag;
+}
+
+
 /**Вспомогательная функция для фигур, которые ходят по прямой для steps_prediction()*/
-bool beam_logic(short PlayerSelector, chessboard *chessboard1, short to_let, short to_num, bool *barrier, bool *switcher, bool *king_encounter) {
+bool beam_logic(short PlayerSelector, chessboard *chessboard1, short to_let, short to_num, bool *barrier, bool *switcher, bool *king_encounter, bool tracing, short *pinpiece) {
     bool fill = false;
     if ((to_let < 8) and (to_num < 8) and (to_let > -1) and (to_num > -1)) {
         if (chessboard1->Get(to_let, to_num) != "___") {
@@ -294,11 +307,26 @@ bool beam_logic(short PlayerSelector, chessboard *chessboard1, short to_let, sho
                 //съедение
                 fill = true;
                 *switcher = false;
-                if (int(chessboard1->Get(to_let, to_num)[0]) - 48 == 6) {
-                    *king_encounter = true;
+                if (tracing) {
+                    if (*pinpiece >= 0) {
+                        *barrier = true;
+                    } else {
+                        if (int(chessboard1->Get(to_let, to_num)[0]) - 48 == 6) {
+                            *king_encounter = true;
+                            *barrier = true;
+                        } else {
+                            *pinpiece = call(chessboard1->Get(to_let, to_num));
+                        }
+                    }
                 }
-            }
-            *barrier = true;
+                else {
+                    if (int(chessboard1->Get(to_let, to_num)[0]) - 48 == 6) {
+                        *king_encounter = true;
+                    }
+                    *barrier = true;
+                }
+            }   else
+                *barrier = true;
         } else {
             //хождение вперёд
             fill = true;
@@ -338,11 +366,12 @@ bool check_danger(std::string name, short to_let, short to_num, short PlayerSele
     //name можно получить внутри, исходя из цвета, но я не умею работать со строками
     array[call(name)].get(&king_let, &king_num);
     /**перемещение короля*/
-    if ((king_let != to_let) and (king_num !=to_num)){
+    if (!((king_let == to_let) and (king_num == to_num))){
         chessboard2->Set(chessboard2->Get(king_let,king_num),to_let,to_num);
         chessboard2->Set("___",king_let,king_num);
-        chessboard1->Set(name,to_let,to_num);
         chessboard1->Set("___",king_let,king_num);
+        chessboard1->Set(name,to_let,to_num);
+
     }
 
     for (short i = 0; i < 32; ++i) {
@@ -421,9 +450,11 @@ void king_tracing(short PlayerSelector, chessboard *chessboard1, chessboard *che
     fill_matrix_piece(chessboard1, chessboard2, chessboard3, array, false, true, false);
 }
 
+
 /**рендер возможных ходов*/
 void steps_prediction(short from_let, short from_num, short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2,
                       chessboard *chessboard3, piece array[33], bool king_flag, short switch_piece, bool tracing){
+    short pinpiece = -1;
     bool switcher, king_encounter = false;
     switch (switch_piece) {
         case 1: {
@@ -472,20 +503,26 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                 while (!barrier) {
                     to_let += k / 2 + !(k / 2) * -1;
                     to_num += l / 2 + !(l / 2) * -1;
-                    if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, &king_encounter)){
+                    if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, &king_encounter, tracing, &pinpiece)){
                         fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
                     }
                 }
                 barrier = false;
                 if (king_encounter and tracing) {
-                    to_let = from_let;
-                    to_num = from_num;
-                    while (!barrier) {
-                        to_let += k / 2 + !(k / 2) * -1;
-                        to_num += l / 2 + !(l / 2) * -1;
-                        if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, &king_encounter)){
-                            fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher, true);
+                    if (pinpiece < 0) {
+                        to_let = from_let;
+                        to_num = from_num;
+                        while (!barrier) {
+                            to_let += k / 2 + !(k / 2) * -1;
+                            to_num += l / 2 + !(l / 2) * -1;
+                            if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher,
+                                           &king_encounter, tracing, &pinpiece)) {
+                                fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher,
+                                          true);
+                            }
                         }
+                    } else {
+                        array[pinpiece].pin();
                     }
                     break;
                 }
@@ -501,7 +538,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
             short i = 0;
             while(i < 8){
                 if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
-                    if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, &king_encounter)){
+                    if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, &king_encounter, tracing, &pinpiece)){
                         fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
                     }
                 }
@@ -527,7 +564,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                 while (!barrier) {
                     to_let += (k / 2 + !(k / 2) * -1) * !(k % 2);
                     to_num += (l / 2 + !(l / 2) * -1) * !(l % 2);
-                    if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, &king_encounter)){
+                    if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, &king_encounter, tracing, &pinpiece)){
                         fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
                     }
                 }
@@ -539,7 +576,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                         to_let += (k / 2 + !(k / 2) * -1) * !(k % 2);
                         to_num += (l / 2 + !(l / 2) * -1) * !(l % 2);
                         if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher,
-                                       &king_encounter)) {
+                                       &king_encounter,  tracing, &pinpiece)) {
                             fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher, true);
                         }
                     }
@@ -556,13 +593,18 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                 short l = (k + 2) % 8;
                 short to_let = from_let;
                 short to_num = from_num;
+
                 while (!barrier) {
                     to_let += (k / 4 + !(k / 4) * -1) * bool((k + 1) % 4);
                     to_num += (l / 4 + !(l / 4) * -1) * bool((l + 1) % 4);
-                    if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, &king_encounter)){
-                        fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher, king_flag);
+                    if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher,
+                                   &king_encounter, tracing, &pinpiece)) {
+                        fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher,
+                                  king_flag);
                     }
                 }
+
+
                 barrier = false;
                 if (king_encounter and tracing) {
                     to_let = from_let;
@@ -570,7 +612,8 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                     while (!barrier) {
                         to_let += (k / 4 + !(k / 4) * -1) * bool((k + 1) % 4);
                         to_num += (l / 4 + !(l / 4) * -1) * bool((l + 1) % 4);
-                        if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, &king_encounter)){
+                        if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher,
+                                       &king_encounter, tracing, &pinpiece)) {
                             fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher, true);
                         }
                     }
@@ -758,73 +801,253 @@ void game_state(){
 
 }
 
-int main(){
-    SetConsoleOutputCP(CP_UTF8);
-    bool switch_mod = true;
-    std::cout << "Выберите режим\n";
-    std::cin >> switch_mod; //баг: игра впадает в ступор, если вбить что-то кроме 0 и 1;
-    piece array[33];
-
-    {
-        //пешечки-пушечки
-        fill(array, 0, 0, 6, "101");
-        fill(array, 1, 1, 6, "102");
-        fill(array, 2, 2, 6, "103");
-        fill(array, 3, 3, 6, "104");
-
-        fill(array, 4, 4, 6, "105");
-        fill(array, 5, 5, 6, "106");
-        fill(array, 6, 6, 6, "107");
-        fill(array, 7, 7, 6, "108");
-
-        fill(array, 8, 0, 1, "111");
-        fill(array, 9, 1, 1, "112");
-        fill(array, 10, 2, 1, "113");
-        fill(array, 11, 3, 1, "114");
-
-        fill(array, 12, 4, 1, "115");
-        fill(array, 13, 5, 1, "116");
-        fill(array, 14, 6, 1, "117");
-        fill(array, 15, 7, 1, "118");
-
-        //слоники
-        fill(array, 16, 2, 7, "201");
-        fill(array, 17, 5, 7, "202");
-        fill(array, 18, 2, 0, "211");
-        fill(array, 19, 5, 0, "212");
-
-        //коники
-        fill(array, 20, 1, 7, "301");
-        fill(array, 21, 6, 7, "302");
-        fill(array, 22, 1, 0, "311");
-        fill(array, 23, 6, 0, "312");
-
-        //кастлы
-        fill(array, 24, 0, 7, "401");
-        fill(array, 25, 7, 7, "402");
-        fill(array, 26, 0, 0, "411");
-        fill(array, 27, 7, 0, "412");
-
-        //знать
-        fill(array, 28, 3, 7, "501");
-        fill(array, 29, 3, 0, "511");
-        fill(array, 30, 4, 7, "601");
-        fill(array, 31, 4, 0, "611");
-
-        //гост
-        fill(array, 32, 0, 0, "uwu");
-        array[32].kill();
+std::string Get_filename(){
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    std::string nomber = "";
+    int i = 0;
+    while ((std::to_string(ltm->tm_mday))[i]!=NULL){
+        i++;
     }
+    std::string day = (i == 1?"0":"");
+    i = 0;
+    while ((std::to_string(1 + ltm->tm_mon))[i]!=NULL){
+        i++;
+    }
+    std::string month = (i == 1?"0":"");
+    nomber += day + std::to_string(ltm->tm_mday) + "_" + month + std::to_string(1 + ltm->tm_mon) + "_" + std::to_string(1900 + ltm->tm_year) + "_" + std::to_string(ltm->tm_hour) + "_" + std::to_string(ltm->tm_min);
+    return nomber;
+}
 
+void find_file(std::string *array){
+    WIN32_FIND_DATA FindFileData;
+    HANDLE hf;
+    hf=FindFirstFile("..\\saves\\*", &FindFileData);
+    if (hf!=INVALID_HANDLE_VALUE){
+        int i = 0;
+        do{
+            if (i>9){
+                for (int j = 1; j < 10; ++j) {
+                    array[j-1] = array[j];
+                }
+                array[9] = FindFileData.cFileName;
+                i++;
+            }else{
+                array[i%10] = FindFileData.cFileName;
+                i++;
+            }
+        }while (FindNextFile(hf,&FindFileData)!=0);
+        FindClose(hf);
+    }
+}
+
+int main(){
+
+
+    // 1 d2 d4 d7 d5 c1 g5
+    SetConsoleOutputCP(CP_UTF8);
+    piece array[33];
     chessboard chessboard1; //подложная
     chessboard chessboard2; //предсказательная для короля
     chessboard chessboard3; //предсказательная
+    short step = 0;
     short PlayerSelector = -1; //переменная, определяющая очерёдность хода, -1 - белые, 1 - чёрные
     bool check1 = false;
     bool check2 = false;
     bool check_mate = false;
     std::string name_enemy = "___";
-    if (!switch_mod){
+    bool flag = false;
+    do{
+        std::cout << "Выберите режим\n";
+        std::cout << "Для перехода в режим разработчика введите 0\n";
+        std::cout << "Для перехода в классический режим введите 1\n";
+        std::cout << "Для загрузки сохранения из файла введите 2\n";
+        char switcher;
+        std::cin >> switcher;
+        switch (switcher) {
+            case '1':{
+                {
+                    //пешечки-пушечки
+                    fill(array, 0, 0, 6, "101");
+                    fill(array, 1, 1, 6, "102");
+                    fill(array, 2, 2, 6, "103");
+                    fill(array, 3, 3, 6, "104");
+
+                    fill(array, 4, 4, 6, "105");
+                    fill(array, 5, 5, 6, "106");
+                    fill(array, 6, 6, 6, "107");
+                    fill(array, 7, 7, 6, "108");
+
+                    fill(array, 8, 0, 1, "111");
+                    fill(array, 9, 1, 1, "112");
+                    fill(array, 10, 2, 1, "113");
+                    fill(array, 11, 3, 1, "114");
+
+                    fill(array, 12, 4, 1, "115");
+                    fill(array, 13, 5, 1, "116");
+                    fill(array, 14, 6, 1, "117");
+                    fill(array, 15, 7, 1, "118");
+
+                    //слоники
+                    fill(array, 16, 2, 7, "201");
+                    fill(array, 17, 5, 7, "202");
+                    fill(array, 18, 2, 0, "211");
+                    fill(array, 19, 5, 0, "212");
+
+                    //коники
+                    fill(array, 20, 1, 7, "301");
+                    fill(array, 21, 6, 7, "302");
+                    fill(array, 22, 1, 0, "311");
+                    fill(array, 23, 6, 0, "312");
+
+                    //кастлы
+                    fill(array, 24, 0, 7, "401");
+                    fill(array, 25, 7, 7, "402");
+                    fill(array, 26, 0, 0, "411");
+                    fill(array, 27, 7, 0, "412");
+
+                    //знать
+                    fill(array, 28, 3, 7, "501");
+                    fill(array, 29, 3, 0, "511");
+                    fill(array, 30, 4, 7, "601");
+                    fill(array, 31, 4, 0, "611");
+
+                    //гост
+                    fill(array, 32, 0, 0, "uwu");
+                    array[32].kill();
+                }
+                flag = true;
+                break;
+            }
+            case '0':{
+
+                for (short i = 0; i < 32; ++i) {
+                    array[i].kill();
+                }
+
+                clean_matrix(&chessboard1);
+
+                clean_matrix(&chessboard3);
+
+                clean_matrix(&chessboard2);
+
+                fill(array, 31, 4, 0, "611");
+                fill(array, 30, 4, 7, "601");
+                //fill(array, 28, 0, 1, "501");
+                //fill(array, 8, 7, 1, "111");
+                fill(array, 17, 0, 4, "202");
+                fill(array, 29, 3, 0, "511");
+                //fill(array, 24, 6, 0, "401");
+                fill(array, 26, 0, 0, "411");
+                flag = true;
+                break;
+            }
+            case '2': {
+                std::string filename, path = "..\\saves\\";
+                std::cout << "Выберите файл из списка или введите 10 чтобы вписать свое имя файла\n";
+                short switcher = NULL;
+                std::string vector_filename [10];
+                for (int i = 0; i < 10; ++i) {
+                    vector_filename[i] = "";
+                }
+                find_file(vector_filename);
+                int j = 0;
+                for (int i = 9; i >= 0; --i) {
+                    std::cout<< j << ". " << vector_filename[i] << std::endl;
+                    j++;
+                }
+                std::cin >> switcher;
+                if (switcher == 10){
+                    std::cout << "Введите имя файла\n";
+                    std::cin >> filename;
+                    path+= filename + ".txt";
+                }else{
+                    if ((switcher >= 0) and (switcher <= 9)){
+                        path += vector_filename[abs(switcher-9)];
+                    }
+                }
+
+                std::ifstream file;
+                //"..\\cmake-build-debug\\huis.txt"
+                file.open(path);
+                if (file.is_open()) {
+                    std::cout << "Файл открыт\n";
+                    std::string start="", end = "", line;
+                    char buf = '$';
+                    int i = 0;
+                    while (!file.eof()) {
+                        std::getline(file, line);
+                        if (line[0] == buf){
+                            (i == 0 ? start : end) = line;
+                            if (i == 0) end = line;
+                            i++;
+                        }
+                    }
+                    file.close();
+                    file.open(path,std::ios::in);
+                    if (!file.is_open()){
+                        std::cout <<"Файл повторно не открылся\n";
+                        break;
+                    }
+                    bool flag1 = false;
+                    short step1, step2;
+                    while (!flag1){
+                        std::cout << "Выберите ход с " << start[1] << " по " << end[1] << "\n";
+                        std::cin >> step1;
+                        if((step1>=int(start[1])-48) and (step1<=int(end[1])-48)){
+                            flag1 = true;
+                        }
+                    }
+
+                    std::string line1 = "$";
+                    line1 += std::to_string(step1);
+                    while (!file.eof()) {
+                        std::getline(file, line);
+                        if (line == line1) {
+                            const char delim = ' ';
+                            const char delim1 = '\n';
+                            for (int i = 0; i <= 32; i++) {
+                                std::string name;
+                                bool color, moveCheck, death, is_pinned;
+                                short posLet, posNum;
+                                std::getline(file, line, delim);
+                                name = line;
+                                std::getline(file, line, delim);
+                                posLet = int(line[0])- 48;
+                                std::getline(file, line, delim);
+                                posNum = int(line[0])- 48;
+                                std::getline(file, line, delim);
+                                death = int(line[0])- 48;
+                                std::getline(file, line, delim);
+                                is_pinned = int(line[0])- 48;
+                                std::getline(file, line, delim);
+                                moveCheck = int(line[0])- 48;
+                                std::getline(file, line, delim1);
+                                color = int(line[0])- 48;
+                                array[i].set(posLet, posNum, name, moveCheck, color, death, is_pinned);
+                            }
+                        }
+                    }
+                    PlayerSelector = (step1 % 2? 1 : -1);
+                    step = step1 - 1;
+                    file.close();
+                    flag = true;
+                }else{
+                    std::cout << "Файл не открылся\n";
+                }
+
+                break;
+            }
+            default:{
+                break;
+            }
+        }
+    }while (!flag);
+
+
+
+
+    /*if (!switch_mod){
 
         for (short i = 0; i < 32; ++i) {
             array[i].kill();
@@ -839,7 +1062,7 @@ int main(){
         fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true, true);
         chessboard3.render_view();
 
-        /** Пофиксить баг с перестановкой фигуры */
+        //Пофиксить баг с перестановкой фигуры 
         bool switcher = true;
         std::cout << "Выберите мод\n";
         std::cin>> switcher;
@@ -876,7 +1099,7 @@ int main(){
         }else{
             fill(array, 31, 4, 0, "611");
             fill(array, 30, 4, 7, "601");
-            fill(array, 28, 0, 4, "501");
+            fill(array, 28, 0, 1, "501");
             //fill(array, 8, 7, 1, "111");
             fill(array, 29, 3, 0, "511");
             //fill(array, 24, 6, 0, "401");
@@ -884,15 +1107,30 @@ int main(){
             fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true, true);
             chessboard3.render_view();
         }
+    } */
+
+    fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true, true);
+
+    std::string path_saves = "..\\saves\\chess_game";
+    path_saves += Get_filename() + ".txt";
+    std::ofstream MyFile(path_saves);
+
+    MyFile  << "$" << step << "\n" ;
+    for (int i = 0; i<= 32; i++){
+        std::string name;
+        short posLet, posNum;
+        array[i].get(&posLet,&posNum);
+        array[i].get(&name);
+        MyFile << name << " " << posLet << " " << posNum << " " << array[i].get_death() << " " ;
+        MyFile << array[i].get_pin() << " " << array[i].get_move() << " " << array[i].get_color() << "\n";
     }
-
+    MyFile << "\n";
+    MyFile.close();
     std::string from_pos, to_pos;
-
     short from_let, from_num, to_let, to_num;
 
     //надо менять цикл с while на do while, игру изнутри остановить невозможно.
     while((from_pos != "-1") or !check_mate or (to_pos != "-1")){
-
         /**заполнение подложной матрицы*/
         clean_matrix(&chessboard1);
         /**заполнение игровой матрицы*/
@@ -900,7 +1138,7 @@ int main(){
         /**заполнение предсказательной матрицы*/
         clean_matrix(&chessboard2);
 
-        /**размещение фигур*/ //я бы разбил его на разные филлы, но пока не уверен
+        /**размещение фигур*/
         fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true, true);
 
         /**проверка на чеки*/
@@ -917,7 +1155,7 @@ int main(){
         bool l = false;
 
         std::cin >> from_pos;
-
+        if (from_pos == "-1") break;
         do {
             /**перезаполнение предсказательной матрицы*/
             clean_matrix(&chessboard3);
@@ -963,12 +1201,13 @@ int main(){
                         comparison(&chessboard2, &chessboard3);
                     }
 
-                    //chessboard2.render_predict();
+                    chessboard2.render_predict();
                     //std::cout << "cb3 render post-comp\n";
                     chessboard3.render_predict();
 
                     /**перевод координат*/
                     std::cin >> to_pos;
+                    if (to_pos == "-1") break;
                     to_let = to_pos[0] - 65;
                     to_num = to_pos[1] - 49;
                     if (to_let > 8)
@@ -983,6 +1222,7 @@ int main(){
                                 array[second_piece].kill();
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
+                                step++;
                                 l = true;
                             } else if (chessboard3.Get(to_let, to_num)[1] == 'O') {
                                 //рокировка
@@ -999,10 +1239,12 @@ int main(){
                                                                    &chessboard1, array);
                                 }
                                 PlayerSelector *= -1;
+                                step++;
                                 l = true;
                             } else {
                                 array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                          &chessboard1, array);
+                                step++;
                                 l = true;
                             }
                         } else {
@@ -1027,11 +1269,24 @@ int main(){
                 std::cout << "Выход за границы доски\n";
                 l = true;
             }
-        }while (!l);
 
+        }while (!l);
+        MyFile.open(path_saves, std::ios::app);
+        MyFile  << "$" << step << "\n" ;
+        for (int i = 0; i<= 32; i++){
+            std::string name;
+            short posLet, posNum;
+            array[i].get(&posLet,&posNum);
+            array[i].get(&name);
+            MyFile << name << " " << posLet << " " << posNum << " " << array[i].get_death() << " " ;
+            MyFile << array[i].get_pin() << " " << array[i].get_move() << " " << array[i].get_color() << "\n";
+        }
+        MyFile << "\n";
+        MyFile.close();
     }
     std::cout << "Легитимный выход из программы.";
     return 0;
 }
+
 //Надо провести рефакторинг кода
-//d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e2 e4 h6
+//1 d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e2 e4 h6 c1 -1

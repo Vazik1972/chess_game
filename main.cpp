@@ -104,12 +104,6 @@ private:
 
 class piece {
 public:
-    /*
-    static void killer(short to_let, short to_num, chessboard *chessboard1, piece array[33]) {
-        short second_piece = call(chessboard1->Get(to_let, to_num));
-        array[second_piece].kill();
-    }
-     */
 
     void mover(short from_let, short from_num, short to_let, short to_num, short *PlayerSelector, chessboard *chessboard1,
                piece array[33]) {
@@ -268,7 +262,7 @@ short call_replacement(short posLet, short posNum, piece array[]){
 /**Вспомогательная функция для steps_prediction()
  * Используется для нанесения на предсказательные матрицы флагов (обозначающих: можно сходить, можно съесть)*/
 // к переработке?
-void fill_cell(short PlayerSelector, chessboard *chessboard2, chessboard *chessboard3, piece array[33],
+void fill_cell(short PlayerSelector, chessboard *chessboard2, chessboard *chessboard3, piece array[],
                short to_let, short to_num, short switcher, bool king_flag) {
     std::string name;
     if (king_flag) {
@@ -531,23 +525,29 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                 }
             }
             //диагональ вправо на 1
-            to_let = from_let + 1;
-            to_num = from_num + (-1 * PlayerSelector);
-            if (pawn_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, false, &switcher, king_encounter)){
-                fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+            if (to_let < 7) {
+                to_let = from_let + 1;
+                to_num = from_num + (-1 * PlayerSelector);
+                if (pawn_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, false, &switcher, king_encounter)){
+                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+                }
+                if (king_encounter and tracing){
+                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, true);
+                }
             }
-            if (king_encounter and tracing){
-                fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, true);
-            }
+
             //диагональ влево на 1
-            to_let = from_let - 1;
-            to_num = from_num + (-1 * PlayerSelector);
-            if (pawn_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, false, &switcher, king_encounter)){
-                fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+            if (to_let > 0) {
+                to_let = from_let - 1;
+                to_num = from_num + (-1 * PlayerSelector);
+                if (pawn_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, false, &switcher, king_encounter)){
+                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+                }
+                if (king_encounter and tracing){
+                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, true);
+                }
             }
-            if (king_encounter and tracing){
-                fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, true);
-            }
+
             break;
         }
         case 2: {
@@ -1393,7 +1393,6 @@ int main(){
                     i++;
                 }
             }
-            //std::cout << i << std::endl;
 
             if (step>=i) {
                 file_save(array, step, path_saves);
@@ -1408,5 +1407,4 @@ int main(){
 }
 
 //Надо провести рефакторинг кода
-//                          !!
 //1 d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e2 e4 h6 c1 -1

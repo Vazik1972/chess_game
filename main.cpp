@@ -250,10 +250,10 @@ void fill(piece array[], short i, short posLet, short posNum, std::string Name){
 short call_replacement(short posLet, short posNum, piece array[]){
     short i = -1;
     bool find = false;
-    short posLet1, posNum1;
+    short posLet1 = 8, posNum1 = 8;
     while (!find) {
         i++;
-        array[i].get(&posLet1, &posNum1);
+        if (!array[i].get_death()) array[i].get(&posLet1, &posNum1);
         if ((posLet == posLet1) and (posNum == posNum1)) find = true;
     }
     return i;
@@ -262,8 +262,7 @@ short call_replacement(short posLet, short posNum, piece array[]){
 /**Вспомогательная функция для steps_prediction()
  * Используется для нанесения на предсказательные матрицы флагов (обозначающих: можно сходить, можно съесть)*/
 // к переработке?
-void fill_cell(short PlayerSelector, chessboard *chessboard2, chessboard *chessboard3, piece array[],
-               short to_let, short to_num, short switcher, bool king_flag) {
+void fill_cell(chessboard *chessboard2, chessboard *chessboard3, short to_let, short to_num, short switcher, bool king_flag) {
     std::string name;
     if (king_flag) {
         name = chessboard2->Get(to_let, to_num);
@@ -355,7 +354,7 @@ bool beam_logic(short PlayerSelector, chessboard *chessboard1, short to_let, sho
 
 /**Вспомогательная функция для короля для steps_prediction()*/
 bool king_logic(short PlayerSelector, chessboard *chessboard1,
-                chessboard *chessboard2, chessboard *chessboard3, piece array[33], short to_let, short to_num, bool *switcher){
+                chessboard *chessboard2, chessboard *chessboard3, piece array[], short to_let, short to_num, bool *switcher){
     bool fill = false;
     if (chessboard1->Get(to_let,to_num) != "___"){
         if ((short(chessboard1->Get(to_let,to_num)[1])-48 != -1 * PlayerSelector) and (PlayerSelector <= short(chessboard1->Get(to_let,to_num)[1])-48)){
@@ -385,8 +384,7 @@ bool check_danger(short to_let, short to_num, short PlayerSelector, chessboard *
     name += std::to_string(firstcolor);
     name += "1";
 
-    short index = 30 + firstcolor;
-    array[index].get(&king_let, &king_num);
+    array[30 + firstcolor].get(&king_let, &king_num);
 
     /**перемещение короля*/
     if (!((king_let == to_let) and (king_num == to_num))){
@@ -398,7 +396,7 @@ bool check_danger(short to_let, short to_num, short PlayerSelector, chessboard *
 
     for (short i = 0; i < 32; ++i) {
         if (!array[i].get_death()){
-            if (index == i) continue;
+            if (30 + firstcolor == i) continue;
             if ((array[i].get_color() != firstcolor)) {
                 short num, let;
                 std::string name1;
@@ -430,12 +428,11 @@ void add_check(bool *check1, bool *check2){
 }
 
 
-//ОНО ПОЧТИ-ПОЧТИ РАБОТАЕТ
-void king_tracing(short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[33], bool *check1, bool *check2, short piece_num){
+void king_tracing(short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[], bool *check1, bool *check2, short piece_num){
     bool firstcolor = PlayerSelector == -1;
     short pinpiece = -1, check_piece = -1;
     short num, let;
-    std::string name1;
+    std::string name;
     for (short i = 0; i < 30; ++i) {
         if (!*check2) {
             if (!array[i].get_death() and (array[i].get_color() != firstcolor)) {
@@ -443,8 +440,8 @@ void king_tracing(short PlayerSelector, chessboard *chessboard1, chessboard *che
                 bool king_encounter = false;
 
                 array[i].get(&let, &num);
-                array[i].get(&name1);
-                short switch_piece = short(name1[0]) - 48;
+                array[i].get(&name);
+                short switch_piece = short(name[0]) - 48;
                 steps_prediction(let, num, PlayerSelector * -1, chessboard1, chessboard2,
                                  chessboard3, array, false, switch_piece, true, &king_encounter, pinpiece);
                 short pos_let, pos_num;
@@ -478,8 +475,8 @@ void king_tracing(short PlayerSelector, chessboard *chessboard1, chessboard *che
         fill_matrix_piece(chessboard1, chessboard2, chessboard3, array, false, false, true);
         if (!*check2 and !array[piece_num].get_pin()) {
             array[check_piece].get(&let, &num);
-            array[check_piece].get(&name1);
-            short switch_piece = short(name1[0]) - 48;
+            array[check_piece].get(&name);
+            short switch_piece = short(name[0]) - 48;
             bool king_encounter = false;
             steps_prediction(let, num, PlayerSelector * -1, chessboard1, chessboard2,
                              chessboard3, array, false, switch_piece, true, &king_encounter, pinpiece);
@@ -514,14 +511,14 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
             short to_let = from_let;
             short to_num = from_num + (-1 * PlayerSelector);
             if (pawn_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, true, &switcher, king_encounter)){
-                fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+                fill_cell(chessboard2,  chessboard3, to_let, to_num, switcher, king_flag);
             }
             //на 2 вперёд
             if (!barrier and !array[call_replacement(from_let, from_num, array)].get_move()) {
                 to_let = from_let;
                 to_num = from_num + (-2 * PlayerSelector);
                 if (pawn_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, true, &switcher, king_encounter)){
-                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+                    fill_cell(chessboard2,  chessboard3, to_let, to_num, switcher, king_flag);
                 }
             }
             //диагональ вправо на 1
@@ -529,10 +526,10 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                 to_let = from_let + 1;
                 to_num = from_num + (-1 * PlayerSelector);
                 if (pawn_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, false, &switcher, king_encounter)){
-                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+                    fill_cell(chessboard2,  chessboard3, to_let, to_num, switcher, king_flag);
                 }
                 if (king_encounter and tracing){
-                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, true);
+                    fill_cell(chessboard2,  chessboard3, to_let, to_num, switcher, true);
                 }
             }
 
@@ -541,10 +538,10 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                 to_let = from_let - 1;
                 to_num = from_num + (-1 * PlayerSelector);
                 if (pawn_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, false, &switcher, king_encounter)){
-                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+                    fill_cell(chessboard2,  chessboard3, to_let, to_num, switcher, king_flag);
                 }
                 if (king_encounter and tracing){
-                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, true);
+                    fill_cell(chessboard2,  chessboard3, to_let, to_num, switcher, true);
                 }
             }
 
@@ -562,7 +559,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                     to_num += l / 2 + !(l / 2) * -1;
                     if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, king_encounter,
                                    tracing, &pinpiece, array)) {
-                        fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher, king_flag);
+                        fill_cell(chessboard2, chessboard3, to_let, to_num, switcher, king_flag);
                     }
                 }
                 barrier = false;
@@ -575,8 +572,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                         to_num += l / 2 + !(l / 2) * -1;
                         if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher,
                                        king_encounter, tracing, &pinpiece, array)) {
-                            fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher,
-                                      true);
+                            fill_cell(chessboard2, chessboard3, to_let, to_num, switcher, true);
                         }
                     }
                     if (pinpiece >= 0) array[pinpiece].pin();
@@ -595,11 +591,11 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
             while(i < 8){
                 if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
                     if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, king_encounter, tracing, &pinpiece, array)){
-                        fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+                        fill_cell(chessboard2,  chessboard3, to_let, to_num, switcher, king_flag);
                     }
                 }
                 if (*king_encounter and tracing) {
-                    fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, true);
+                    fill_cell(chessboard2,  chessboard3, to_let, to_num, switcher, true);
                     break;
                 }
                 short j = (i + 2) % 8;
@@ -621,7 +617,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                     to_let += (k / 2 + !(k / 2) * -1) * !(k % 2);
                     to_num += (l / 2 + !(l / 2) * -1) * !(l % 2);
                     if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher, king_encounter, tracing, &pinpiece, array)){
-                        fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+                        fill_cell(chessboard2,  chessboard3, to_let, to_num, switcher, king_flag);
                     }
                 }
                 barrier = false;
@@ -634,7 +630,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                         to_num += (l / 2 + !(l / 2) * -1) * !(l % 2);
                         if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher,
                                        king_encounter,  tracing, &pinpiece, array)) {
-                            fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher, true);
+                            fill_cell(chessboard2, chessboard3, to_let, to_num, switcher, true);
                         }
                     }
                     if (pinpiece >= 0) array[pinpiece].pin();
@@ -657,8 +653,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                     to_num += (l / 4 + !(l / 4) * -1) * bool((l + 1) % 4);
                     if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher,
                                    king_encounter, tracing, &pinpiece, array)) {
-                        fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher,
-                                  king_flag);
+                        fill_cell(chessboard2, chessboard3, to_let, to_num, switcher, king_flag);
                     }
                 }
 
@@ -673,7 +668,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                         to_num += (l / 4 + !(l / 4) * -1) * bool((l + 1) % 4);
                         if (beam_logic(PlayerSelector, chessboard1, to_let, to_num, &barrier, &switcher,
                                        king_encounter, tracing, &pinpiece, array)) {
-                            fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let, to_num, switcher, true);
+                            fill_cell(chessboard2, chessboard3, to_let, to_num, switcher, true);
                         }
                     }
                     if (pinpiece >= 0) array[pinpiece].pin();
@@ -697,7 +692,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                 while (k < 8) {
                     if ((to_let > -1) and (to_let < 8) and (to_num > -1) and (to_num < 8)) {
                         if (king_logic(PlayerSelector, chessboard1, chessboard2, chessboard3, array, to_let, to_num, &switcher)) {
-                            fill_cell(PlayerSelector, chessboard2,  chessboard3, array, to_let, to_num, switcher, king_flag);
+                            fill_cell(chessboard2, chessboard3, to_let, to_num, switcher, king_flag);
                         }
                     }
                     bool yx = (k % 4) / 2;
@@ -735,7 +730,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                             if (!danger) {
                                 if ((int(chessboard1->Get(7, from_num)[0]) - 48 == 4) and
                                     (!array[call_replacement(7, from_num, array)].get_move())) {
-                                    fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let + 2, to_num, 2, king_flag);
+                                    fill_cell(chessboard2, chessboard3, to_let + 2, to_num, 2, king_flag);
                                 }
                             }
                         }
@@ -760,7 +755,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                             if (!danger) {
                                 if ((int(chessboard1->Get(0, from_num)[0]) - 48 == 4) and
                                         (!array[call_replacement(0, from_num, array)].get_move())) {
-                                    fill_cell(PlayerSelector, chessboard2, chessboard3, array, to_let - 2, to_num, 2, king_flag);
+                                    fill_cell(chessboard2, chessboard3, to_let - 2, to_num, 2, king_flag);
                                 }
                             }
                         }
@@ -857,8 +852,36 @@ void fill_matrix_piece(chessboard *chessboard1, chessboard *chessboard2, chessbo
 
 
 /**функция будет оценивать игру на наличие мата или пата*/
-void game_state(){
-
+//по-хорошему бы надо бы добавить маркер в steps_prediction, который бы выплёвывался сразу после использования fill_cell,
+//но пока и так сойдёт
+bool game_state(piece array[], short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, bool check1){
+    bool firstcolor = PlayerSelector == -1;
+    short let, num;
+    bool blank, result = false;
+    std::string name;
+    if (check1) {
+        array[30+firstcolor].get(&let, &num);
+        array[30+firstcolor].get(&name);
+        short switch_piece = short(name[0]) - 48;
+        steps_prediction(let, num, PlayerSelector, chessboard1, chessboard2, chessboard3, array,
+                         false, switch_piece, false, &blank, NULL);
+    } else {
+        for (int i = 0; i < 32; i++) {
+            if ((!array[i].get_death()) and (array[i].get_color() == firstcolor)) {
+                array[i].get(&let, &num);
+                array[i].get(&name);
+                short switch_piece = short(name[0]) - 48;
+                steps_prediction(let, num, PlayerSelector, chessboard1, chessboard2, chessboard3, array,
+                                 false, switch_piece, false, &blank, NULL);
+            }
+        }
+    }
+    for (short i = 0; i < 8; ++i) {
+        for (short j = 0; j < 8; ++j) {
+            if ((chessboard3->Get(i,j)[1] == '$') or (chessboard3->Get(i,j)[1] == 'X') or (chessboard3->Get(i,j)[1] == '0')) {result = true; break;}
+        }
+    }
+    return result;
 }
 
 std::string file_get_name(){
@@ -967,7 +990,7 @@ int main(){
 
         std::cin >> switch_mod;
         switch (switch_mod) {
-            case '1':{
+            case '1': {
                 std::string path = "..\\presets\\main.txt";
                 std::string line1 = "$0";
                 file_reader(path, line1, array, &flag);
@@ -1154,7 +1177,6 @@ int main(){
     short from_let, from_num, to_let, to_num;
 
     short step1;
-    //надо менять цикл с while на do while, игру изнутри остановить невозможно.
     while((from_pos != "-1") and !check_mate and (to_pos != "-1")){
 
         /**заполнение подложной матрицы*/
@@ -1241,9 +1263,18 @@ int main(){
             for (short i = 0; i < 33; i++) {
                 array[i].unpin();
             }
-            //king_tracing(PlayerSelector, &chessboard1, &chessboard2, &chessboard3, array, &check1, &check2, -2);
-            //chessboard2.render_old();
-            //game_state();
+            /**здесь происходит проверка самочувствия короля и последующая оценка состояния игры*/
+            king_tracing(PlayerSelector, &chessboard1, &chessboard2, &chessboard3, array, &check1, &check2, -2);
+            if (!game_state(array, PlayerSelector, &chessboard1, &chessboard2, &chessboard3, check1)) {
+                if (check1) {
+                    std::cout << "Мат, победа ";
+                    if (PlayerSelector == -1) {
+                        std::cout << "Чёрных\n";
+                    } else std::cout << "Белых\n";
+                } else std::cout << "Пат, ничья\n";
+                chessboard3.render_view();
+                break;
+            }
 
             std::cout << (PlayerSelector == -1 ? "Ход Белых\n" : "Ход Чёрных\n");
             std::cout << step << "\n";
@@ -1399,7 +1430,6 @@ int main(){
             }
 
         }
-        /**проверка на чеки*/
 
     }
     std::cout << "Легитимный выход из программы.";
@@ -1407,4 +1437,6 @@ int main(){
 }
 
 //Надо провести рефакторинг кода
-//1 d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e2 e4 h6 c1 -1
+//1 d2 d4 g7 g6 a2 a4 f8 h6 e1 f2 f3 e8 f8 e2 e4 h6 c1 -1 - проверка
+//1 e2 e4 e7 e5 d1 h5 b8 c6 f1 c4 g8 f6 h5 f7 - мат
+//1 e2 e3 a7 a5 d1 h5 a8 a6 h5 a5 h7 h5 a5 c7 a6 h6 h2 h4 f7 f6 c7 d7 e8 f7 d7 b7 d8 d3 b7 b8 d3 h7 b8 c8 f7 g6 c8 e6 - пат

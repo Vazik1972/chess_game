@@ -210,6 +210,11 @@ public:
         this->is_pinned = false;
     }
 
+    void type_changer(char name){
+        this->name[0] = name;
+    }
+
+
 private:
     bool color, moveCheck, death, is_pinned;
     short posLet, posNum;
@@ -754,7 +759,7 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                             }
                             if (!danger) {
                                 if ((int(chessboard1->Get(0, from_num)[0]) - 48 == 4) and
-                                        (!array[call_replacement(0, from_num, array)].get_move())) {
+                                    (!array[call_replacement(0, from_num, array)].get_move())) {
                                     fill_cell(chessboard2, chessboard3, to_let - 2, to_num, 2, king_flag);
                                 }
                             }
@@ -964,6 +969,21 @@ void file_save(piece *array, short step, std::string path_saves) {
     MyFile.close();
 }
 
+
+char type_changer_logic(short PlayerSelector, short num, piece array[]){
+    int type;
+    if ((PlayerSelector != -1) * 7 == num){
+        bool i = true;
+        while (i){
+            std::cout << "Выберите фигуру\n 2 - bishop \n 3 - knight\n 4 - castle\n 5 - queen\n";
+            std::cin >>  type;
+            if((type > 1) and (type < 6)) i = false;
+        }
+    }
+    return std::to_string(type)[0];
+}
+
+
 int main(){
 
     // 1 d2 d4 d7 d5 c1 g5
@@ -1013,7 +1033,7 @@ int main(){
                 fill(array, 31, 4, 0, "611");
                 fill(array, 30, 4, 7, "601");
                 fill(array, 28, 3, 4, "501");
-                //fill(array, 8, 7, 1, "111");
+                fill(array, 8, 7, 6, "111");
                 fill(array, 17, 0, 4, "202");
                 fill(array, 29, 3, 1, "511");
                 //fill(array, 24, 6, 0, "401");
@@ -1308,6 +1328,9 @@ int main(){
                                         array[second_piece].kill();
                                         array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                                  &chessboard1, array);
+                                        if (piece_name[0] == '1'){
+                                            array[first_piece].type_changer(type_changer_logic(PlayerSelector,to_num, array));
+                                        }
                                         step++;
                                         l = true;
                                     } else if (chessboard3.Get(to_let, to_num)[1] == 'O') {
@@ -1316,10 +1339,10 @@ int main(){
                                                                  &chessboard1, array);
                                         if (to_let / 4) {
                                             array[call_replacement(7, to_num, array)].mover(7, from_num, 5, to_num, &PlayerSelector,
-                                                                           &chessboard1, array);
+                                                                                            &chessboard1, array);
                                         } else {
                                             array[call_replacement(0, to_num, array)].mover(0, from_num, 3, to_num, &PlayerSelector,
-                                                                           &chessboard1, array);
+                                                                                            &chessboard1, array);
                                         }
                                         PlayerSelector *= -1;
                                         step++;
@@ -1327,6 +1350,10 @@ int main(){
                                     } else {
                                         array[first_piece].mover(from_let, from_num, to_let, to_num, &PlayerSelector,
                                                                  &chessboard1, array);
+                                        if (piece_name[0] == '1'){
+                                            array[first_piece].type_changer(type_changer_logic(PlayerSelector,to_num, array));
+                                        }
+
                                         step++;
                                         l = true;
                                     }

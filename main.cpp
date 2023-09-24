@@ -862,9 +862,8 @@ bool game_state(piece array[], short PlayerSelector, chessboard *chessboard1, ch
     if (check1) {
         array[30+firstcolor].get(&let, &num);
         array[30+firstcolor].get(&name);
-        short switch_piece = short(name[0]) - 48;
         steps_prediction(let, num, PlayerSelector, chessboard1, chessboard2, chessboard3, array,
-                         false, switch_piece, false, &blank, NULL);
+                         false, 6, false, &blank, NULL);
     } else {
         for (int i = 0; i < 32; i++) {
             if ((!array[i].get_death()) and (array[i].get_color() == firstcolor)) {
@@ -883,6 +882,8 @@ bool game_state(piece array[], short PlayerSelector, chessboard *chessboard1, ch
     }
     return result;
 }
+
+
 
 std::string file_get_name(){
     time_t now = time(0);
@@ -924,7 +925,7 @@ void file_find(std::string *array){
     }
 }
 
-void file_reader(std::string path, std::string line1, piece *array, bool *flag){
+void file_import(std::string path, std::string line1, piece *array, bool *flag){
     std::ifstream file;
     file.open(path, std::ios::in);
     if (file.is_open()) {
@@ -949,7 +950,7 @@ void file_reader(std::string path, std::string line1, piece *array, bool *flag){
 // 2 10 chess_game05_03_2023_17_40 cont
 
 void file_save(piece *array, short step, std::string path_saves) {
-    std::ofstream MyFile(path_saves);
+    std::fstream MyFile(path_saves, std::ios::app);
     MyFile << "$" << step << "\n";
     for (int i = 0; i <= 32; i++) {
         std::string name;
@@ -993,7 +994,7 @@ int main(){
             case '1': {
                 std::string path = "..\\presets\\main.txt";
                 std::string line1 = "$0";
-                file_reader(path, line1, array, &flag);
+                file_import(path, line1, array, &flag);
                 break;
             }
             case '0': {
@@ -1065,11 +1066,15 @@ int main(){
                     file.close();
 
                     std::string change;
-                    short step1 = short(end[1]) - 48;
+                    short step1 = 0;
+                    std::string step2 = end;
+                    step1 = std::stoi(step2.erase(0,1));
+
+
                     std::string line1 = "$";
                     line1 += std::to_string(step1);
 
-                    file_reader(path, line1, array, &flag);
+                    file_import(path, line1, array, &flag);
                     flag = false;
 
                     clean_matrix(&chessboard3);
@@ -1103,68 +1108,6 @@ int main(){
         }
     }while (!flag);
 
-
-    /*if (!switch_mod){
-
-        for (short i = 0; i < 32; ++i) {
-            array[i].kill();
-        }
-
-        clean_matrix(&chessboard1);
-
-        clean_matrix(&chessboard3);
-
-        clean_matrix(&chessboard2);
-
-        fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true, true);
-        chessboard3.render_view();
-
-        //Пофиксить баг с перестановкой фигуры
-        bool switcher = true;
-        std::cout << "Выберите мод\n";
-        std::cin>> switcher;
-        if(switcher){
-            //по-моему, оно вообще не работает
-            bool add_new_piece = true;
-            while (add_new_piece) {
-                std::string name;
-                short from_let, from_num;
-                std::string from_pos;
-                std::cout << "Введите код и координаты фигуры\n";
-                std::cin >> name >> from_pos;
-                int i = call(name);
-                if (!array[i].get_death()) {
-                    array[i].kill();
-                    clean_matrix(&chessboard1);
-                    clean_matrix(&chessboard3);
-                    clean_matrix(&chessboard2);
-                }
-                if (from_pos == "-1") {
-                    array[i].revive();
-                } else {
-                    from_let = from_pos[0] - 65;
-                    from_num = from_pos[1] - 49;
-                    if (from_let > 8) from_let -= 32;
-                    fill(array, i, from_let, from_num, name);
-                }
-
-                fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true, true);
-                chessboard3.render_view();
-                std::cout << "Хотите ли вы добавить новую фигуру?\n";
-                std::cin >> add_new_piece;
-            }
-        }else{
-            fill(array, 31, 4, 0, "611");
-            fill(array, 30, 4, 7, "601");
-            fill(array, 28, 0, 1, "501");
-            //fill(array, 8, 7, 1, "111");
-            fill(array, 29, 3, 0, "511");
-            //fill(array, 24, 6, 0, "401");
-            fill(array, 26, 0, 0, "411");
-            fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true, true);
-            chessboard3.render_view();
-        }
-    } */
 
     fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, true, true, true);
     if(switch_mod != '2') {

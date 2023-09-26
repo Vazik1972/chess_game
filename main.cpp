@@ -626,8 +626,8 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                     }
                 }
                 barrier = false;
+                pinpiece = -1;
                 if (*king_encounter and tracing) {
-                    pinpiece = -1;
                     to_let = from_let;
                     to_num = from_num;
                     while (!barrier) {
@@ -662,10 +662,10 @@ void steps_prediction(short from_let, short from_num, short PlayerSelector, ches
                     }
                 }
 
+                pinpiece = -1;
 
                 barrier = false;
                 if (*king_encounter and tracing) {
-                    pinpiece = -1;
                     to_let = from_let;
                     to_num = from_num;
                     while (!barrier) {
@@ -859,32 +859,42 @@ void fill_matrix_piece(chessboard *chessboard1, chessboard *chessboard2, chessbo
 /**функция будет оценивать игру на наличие мата или пата*/
 //по-хорошему бы надо бы добавить маркер в steps_prediction, который бы выплёвывался сразу после использования fill_cell,
 //но пока и так сойдёт
+//а вот теперь уже точно надо задуматься о маркере, функция больно жирная, стыдоба
 bool game_state(piece array[], short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, bool check1){
-    bool firstcolor = PlayerSelector == -1;
+    bool color = PlayerSelector == -1;
     short let, num;
     bool blank, result = false;
     std::string name;
     if (check1) {
-        array[30+firstcolor].get(&let, &num);
-        array[30+firstcolor].get(&name);
+        array[30+color].get(&let, &num);
+        array[30+color].get(&name);
         steps_prediction(let, num, PlayerSelector, chessboard1, chessboard2, chessboard3, array,
                          false, 6, false, &blank, NULL);
+        if (array[30+color].get_pin()) comparison(chessboard2, chessboard3);
+        for (short i = 0; i < 8; ++i) {
+            for (short j = 0; j < 8; ++j) {
+                if ((chessboard3->Get(i,j)[1] == '$') or (chessboard3->Get(i,j)[1] == 'X') or (chessboard3->Get(i,j)[1] == '0')) {result = true; break;}
+            }
+        }
     } else {
         for (int i = 0; i < 32; i++) {
-            if ((!array[i].get_death()) and (array[i].get_color() == firstcolor)) {
+            if ((!array[i].get_death()) and (array[i].get_color() == color)) {
                 array[i].get(&let, &num);
                 array[i].get(&name);
                 short switch_piece = short(name[0]) - 48;
                 steps_prediction(let, num, PlayerSelector, chessboard1, chessboard2, chessboard3, array,
                                  false, switch_piece, false, &blank, NULL);
+                if (array[i].get_pin()) comparison(chessboard2, chessboard3);
+                for (short i = 0; i < 8; ++i) {
+                    for (short j = 0; j < 8; ++j) {
+                        if ((chessboard3->Get(i,j)[1] == '$') or (chessboard3->Get(i,j)[1] == 'X') or (chessboard3->Get(i,j)[1] == '0')) {result = true; break;}
+                    }
+                }
             }
         }
     }
-    for (short i = 0; i < 8; ++i) {
-        for (short j = 0; j < 8; ++j) {
-            if ((chessboard3->Get(i,j)[1] == '$') or (chessboard3->Get(i,j)[1] == 'X') or (chessboard3->Get(i,j)[1] == '0')) {result = true; break;}
-        }
-    }
+
+
     return result;
 }
 
@@ -971,7 +981,7 @@ void file_save(piece *array, short step, std::string path_saves) {
 
 
 char type_changer_logic(short PlayerSelector, short num, piece array[]){
-    int type;
+    int type = 1;
     if ((PlayerSelector != -1) * 7 == num){
         bool i = true;
         while (i){
@@ -1000,7 +1010,7 @@ int main(){
     bool check_mate = false;
     std::string name_enemy = "___";
     bool flag = false;
-    bool spectate_permanent = false, spectate = false, spectate_flag = false, spectate_return = false;;
+    bool spectate_permanent = false, spectate = false, spectate_flag = false, spectate_return = false;
     std::string path_saves;
     char switch_mod = '0';
     do{

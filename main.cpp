@@ -210,8 +210,11 @@ public:
         this->is_pinned = false;
     }
 
-    void type_changer(char name){
-        this->name[0] = name;
+    void type_changer(char name1){
+        if (name1 == '2') {
+            if ((this->posLet)%2 == (this->posNum)%2) this->name[2] = '8'; else this->name[2] = '9';
+        }
+        this->name[0] = name1;
     }
 
 
@@ -317,11 +320,11 @@ bool beam_logic(short PlayerSelector, chessboard *chessboard1, short to_let, sho
     if ((to_let < 8) and (to_num < 8) and (to_let > -1) and (to_num > -1)) {
         if (chessboard1->Get(to_let, to_num) != "___") {
             if (short(chessboard1->Get(to_let, to_num)[1]) - 48 != -1 * PlayerSelector
-                and PlayerSelector <= int(chessboard1->Get(to_let, to_num)[1]) - 48) {
+                and PlayerSelector <= short(chessboard1->Get(to_let, to_num)[1]) - 48) {
                 //съедение
                 *switcher = false;
                 if (tracing) {
-                    if (int(chessboard1->Get(to_let, to_num)[0]) - 48 == 6) {
+                    if (chessboard1->Get(to_let, to_num)[0] == '6') {
                         *barrier = true;
                         *king_encounter = true;
                         if (*pinpiece < 0) {
@@ -338,7 +341,7 @@ bool beam_logic(short PlayerSelector, chessboard *chessboard1, short to_let, sho
                 }
                 else {
                     fill = true;
-                    if (int(chessboard1->Get(to_let, to_num)[0]) - 48 == 6) {
+                    if (chessboard1->Get(to_let, to_num)[0] == '6') {
                         *king_encounter = true;
                     }
                     *barrier = true;
@@ -347,10 +350,10 @@ bool beam_logic(short PlayerSelector, chessboard *chessboard1, short to_let, sho
                 *barrier = true;
         } else {
             //хождение вперёд
+            *switcher = true;
             if (!tracing) {
                 fill = true;
             } else if (*pinpiece < 0) fill = true;
-            *switcher = true;
         }
     } else *barrier = true;
     return fill;
@@ -382,14 +385,14 @@ bool check_danger(short to_let, short to_num, short PlayerSelector, chessboard *
                   chessboard *chessboard2, chessboard *chessboard3, piece array[]) {
     bool danger = false;
     bool king_encounter;
-    bool firstcolor = PlayerSelector == -1;
+    bool color = PlayerSelector == -1;
     short king_let, king_num;
 
     std::string name = "6";
-    name += std::to_string(firstcolor);
+    name += std::to_string(color);
     name += "1";
 
-    array[30 + firstcolor].get(&king_let, &king_num);
+    array[30 + color].get(&king_let, &king_num);
 
     /**перемещение короля*/
     if (!((king_let == to_let) and (king_num == to_num))){
@@ -401,8 +404,8 @@ bool check_danger(short to_let, short to_num, short PlayerSelector, chessboard *
 
     for (short i = 0; i < 32; ++i) {
         if (!array[i].get_death()){
-            if (30 + firstcolor == i) continue;
-            if ((array[i].get_color() != firstcolor)) {
+            if (30 + color == i) continue;
+            if ((array[i].get_color() != color)) {
                 short num, let;
                 std::string name1;
                 array[i].get(&let, &num);
@@ -432,15 +435,14 @@ void add_check(bool *check1, bool *check2){
         *check1 = true;
 }
 
-
 void king_tracing(short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, piece array[], bool *check1, bool *check2, short piece_num){
-    bool firstcolor = PlayerSelector == -1;
+    bool color = PlayerSelector == -1;
     short pinpiece = -1, check_piece = -1;
     short num, let;
     std::string name;
     for (short i = 0; i < 30; ++i) {
         if (!*check2) {
-            if (!array[i].get_death() and (array[i].get_color() != firstcolor)) {
+            if (!array[i].get_death() and (array[i].get_color() != color)) {
 
                 bool king_encounter = false;
 
@@ -449,12 +451,11 @@ void king_tracing(short PlayerSelector, chessboard *chessboard1, chessboard *che
                 short switch_piece = short(name[0]) - 48;
                 steps_prediction(let, num, PlayerSelector * -1, chessboard1, chessboard2,
                                  chessboard3, array, false, switch_piece, true, &king_encounter, pinpiece);
-                short pos_let, pos_num;
-                array[30 + firstcolor].get(&pos_let, &pos_num);
-                std::string king_name = chessboard2->Get(pos_let, pos_num);
                 if (king_encounter) {
-                    if (king_name[1] == 'X') add_check(check1, check2);
-                    check_piece = i;
+                    short pos_let, pos_num;
+                    array[30 + color].get(&pos_let, &pos_num);
+
+                    std::string king_name = chessboard2->Get(pos_let, pos_num);
                     std::string buffer_name;
                     buffer_name = king_name[0];
                     buffer_name += "_";
@@ -465,6 +466,10 @@ void king_tracing(short PlayerSelector, chessboard *chessboard1, chessboard *che
                     buffer_name += "X";
                     buffer_name += enemy_name[2];
                     chessboard2->Set(buffer_name, let, num);
+
+
+                    if (king_name[1] == 'X') add_check(check1, check2);
+                    check_piece = i;
                 }
             }
 
@@ -486,7 +491,8 @@ void king_tracing(short PlayerSelector, chessboard *chessboard1, chessboard *che
             steps_prediction(let, num, PlayerSelector * -1, chessboard1, chessboard2,
                              chessboard3, array, false, switch_piece, true, &king_encounter, pinpiece);
             short pos_let, pos_num;
-            array[30 + firstcolor].get(&pos_let, &pos_num);
+            array[30 + color].get(&pos_let, &pos_num);
+
             std::string king_name = chessboard2->Get(pos_let, pos_num);
             std::string buffer_name;
             buffer_name = king_name[0];
@@ -858,12 +864,11 @@ void fill_matrix_piece(chessboard *chessboard1, chessboard *chessboard2, chessbo
 
 /**функция будет оценивать игру на наличие мата или пата*/
 //по-хорошему бы надо бы добавить маркер в steps_prediction, который бы выплёвывался сразу после использования fill_cell,
-//но пока и так сойдёт
-//а вот теперь уже точно надо задуматься о маркере, функция больно жирная, стыдоба
+//но пока и так сойдёт,
+//а впрочем, может и не надо
 bool game_state(piece array[], short PlayerSelector, chessboard *chessboard1, chessboard *chessboard2, chessboard *chessboard3, bool check1){
-    bool color = PlayerSelector == -1;
+    bool blank, color = PlayerSelector == -1;
     short let, num;
-    bool blank, result = false;
     std::string name;
     if (check1) {
         array[30+color].get(&let, &num);
@@ -871,13 +876,15 @@ bool game_state(piece array[], short PlayerSelector, chessboard *chessboard1, ch
         steps_prediction(let, num, PlayerSelector, chessboard1, chessboard2, chessboard3, array,
                          false, 6, false, &blank, NULL);
         if (array[30+color].get_pin()) comparison(chessboard2, chessboard3);
-        for (short i = 0; i < 8; ++i) {
-            for (short j = 0; j < 8; ++j) {
-                if ((chessboard3->Get(i,j)[1] == '$') or (chessboard3->Get(i,j)[1] == 'X') or (chessboard3->Get(i,j)[1] == '0')) {result = true; break;}
+        char moveAbility;
+        for (short j = 0; j < 8; ++j) {
+            for (short k = 0; k < 8; ++k) {
+                moveAbility = chessboard3->Get(j,k)[1];
+                if ((moveAbility == '$') or (moveAbility == 'X')) return true;
             }
         }
     } else {
-        for (int i = 0; i < 32; i++) {
+        for (short i = 0; i < 32; i++) {
             if ((!array[i].get_death()) and (array[i].get_color() == color)) {
                 array[i].get(&let, &num);
                 array[i].get(&name);
@@ -885,20 +892,44 @@ bool game_state(piece array[], short PlayerSelector, chessboard *chessboard1, ch
                 steps_prediction(let, num, PlayerSelector, chessboard1, chessboard2, chessboard3, array,
                                  false, switch_piece, false, &blank, NULL);
                 if (array[i].get_pin()) comparison(chessboard2, chessboard3);
-                for (short i = 0; i < 8; ++i) {
-                    for (short j = 0; j < 8; ++j) {
-                        if ((chessboard3->Get(i,j)[1] == '$') or (chessboard3->Get(i,j)[1] == 'X') or (chessboard3->Get(i,j)[1] == '0')) {result = true; break;}
+                char moveAbility;
+                for (short j = 0; j < 8; ++j) {
+                    for (short k = 0; k < 8; ++k) {
+                        moveAbility = chessboard3->Get(j,k)[1];
+                        if ((moveAbility == '$') or (moveAbility == 'X')) {std::cout << i; return true;}
                     }
                 }
             }
         }
     }
-
-
-    return result;
+    return false;
 }
 
-
+bool insufficient_material(piece array[]){
+    bool flag0 = false, flag1 = false, flag2 = false;
+    std::string name;
+    for (short i = 0; i < 30; i++) {
+        if (!array[i].get_death()) {
+            array[i].get(&name);
+            switch (name[0]) {
+                case '2': { /**любое количество однополых слонов - ничья*/
+                    if (!short(name[2]%2)) flag0 = true; else flag1 = true;
+                    if (flag0*flag1) return true;
+                    break;
+                }
+                case '3': { /**1 конь - ничья*/
+                    if (!flag2) flag2 = true; else return true;
+                    break;
+                }
+                default: {
+                    return true;
+                    break;
+                }
+            }
+        }
+    }
+    return false;
+}
 
 std::string file_get_name(){
     time_t now = time(0);
@@ -984,15 +1015,23 @@ char type_changer_logic(short PlayerSelector, short num, piece array[]){
     int type = 1;
     if ((PlayerSelector != -1) * 7 == num){
         bool i = true;
-        while (i){
+        while (i) {
             std::cout << "Выберите фигуру\n 2 - bishop \n 3 - knight\n 4 - castle\n 5 - queen\n";
-            std::cin >>  type;
+            std::cin >> type;
             if((type > 1) and (type < 6)) i = false;
         }
     }
     return std::to_string(type)[0];
 }
 
+bool fifty_move_rule(bool takes, short *since_last_capture){
+    if (!takes) *since_last_capture += 1; else *since_last_capture = 0;
+    if (*since_last_capture == 100) return true; else return false;
+}
+
+bool triple_repetition(piece array[]){
+
+}
 
 int main(){
 
@@ -1004,6 +1043,7 @@ int main(){
     chessboard chessboard3; //предсказательная
 
     short step = 0;
+    short since_last_capture = 0;
     short PlayerSelector = -1; //переменная, определяющая очерёдность хода, -1 - белые, 1 - чёрные
     bool check1 = false;
     bool check2 = false;
@@ -1042,12 +1082,12 @@ int main(){
                 array[32].kill();
                 fill(array, 31, 4, 0, "611");
                 fill(array, 30, 4, 7, "601");
-                fill(array, 28, 3, 4, "501");
-                fill(array, 8, 7, 6, "111");
+                //fill(array, 28, 3, 4, "501");
+                //fill(array, 8, 7, 6, "111");
                 fill(array, 17, 0, 4, "202");
-                fill(array, 29, 3, 1, "511");
+                //fill(array, 29, 3, 1, "511");
                 //fill(array, 24, 6, 0, "401");
-                fill(array, 26, 0, 0, "411");
+                //fill(array, 26, 0, 0, "411");
                 flag = true;
                 break;
             }
@@ -1237,6 +1277,8 @@ int main(){
                 array[i].unpin();
             }
             /**здесь происходит проверка самочувствия короля и последующая оценка состояния игры*/
+            check1 = false;
+            check2 = false;
             king_tracing(PlayerSelector, &chessboard1, &chessboard2, &chessboard3, array, &check1, &check2, -2);
             if (!game_state(array, PlayerSelector, &chessboard1, &chessboard2, &chessboard3, check1)) {
                 if (check1) {
@@ -1248,9 +1290,24 @@ int main(){
                 chessboard3.render_view();
                 break;
             }
+            bool takes = false;
+
+            /**замечание: функцию, наверное, можно внести в game_state*/
+            if(!insufficient_material(array)) {
+                std::cout << "Ничья, недостаточно фигур\n";
+                chessboard3.render_view();
+                break;
+            }
+
+            if (fifty_move_rule(takes, &since_last_capture)) {
+                std::cout << "Ничья по правилу 50 ходов\n";
+                chessboard3.render_view();
+                break;
+            }
 
             std::cout << (PlayerSelector == -1 ? "Ход Белых\n" : "Ход Чёрных\n");
-            std::cout << step << "\n";
+            std::cout << 1 + step/2;
+            if (step%2) std::cout << "b\n"; else std::cout << "w\n";
             //chessboard1.render_predict();
             chessboard3.render_view();
             short first_piece, second_piece;
@@ -1269,8 +1326,6 @@ int main(){
                 /**перезаполнение предсказательной матрицы*/
                 clean_matrix(&chessboard3);
                 clean_matrix(&chessboard2);
-                check1 = false;
-                check2 = false;
 
                 /**переразмещение фигур на предсказательной матрице*/
                 fill_matrix_piece(&chessboard1, &chessboard2, &chessboard3, array, false, true, true);
@@ -1295,8 +1350,11 @@ int main(){
                     if (piece_name[1] != '_') {
                         bool FirstPieceColor = short(piece_name[1]) - 48;
                         if ((FirstPieceColor == -1 * PlayerSelector) or (PlayerSelector > FirstPieceColor)) {
+                            takes = false;
                             short switch_piece = short(piece_name[0]) - 48;
                             bool king_encounter;
+                            check1 = false;
+                            check2 = false;
                             king_tracing(PlayerSelector, &chessboard1, &chessboard2, &chessboard3, array, &check1, &check2,
                                          call_replacement(from_let, from_num, array));
                             //chessboard2.render_old();
@@ -1341,6 +1399,7 @@ int main(){
                                         if (piece_name[0] == '1'){
                                             array[first_piece].type_changer(type_changer_logic(PlayerSelector,to_num, array));
                                         }
+                                        takes = true;
                                         step++;
                                         l = true;
                                     } else if (chessboard3.Get(to_let, to_num)[1] == 'O') {
